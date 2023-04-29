@@ -4,3 +4,5 @@ Meta
 .Rhistory
 .DS_store
 .RData
+/doc/
+/Meta/

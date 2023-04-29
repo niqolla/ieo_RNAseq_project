@@ -11,4 +11,4 @@ Imports: methods, S4Vectors
 Suggests: BiocStyle, knitr, rmarkdown, usethis, kableExtra,
           edgeR, geneplotter, sva, KernSmooth
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
