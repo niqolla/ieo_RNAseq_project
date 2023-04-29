@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 git add .
-git commit -m date
+comment=date
+git commit -m $comment
 git push
