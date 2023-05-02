@@ -175,41 +175,19 @@ colData(se)$lacStageFac <- factor(colData(se)$lacStage)
 colData(se)$protocolFac <- factor(colData(se)$protocol)
 ```
 
-
-Finally, we also observe that the variable `description` contains some
-relevant information about an apparent sub-grouping of the samples,
-within cell lines.
-
-```{r}
-se$description
-```
-
 In Table \@ref(tab:pheno) below, we show this variable jointly with cell
 line and treatment to try to gather as much understanding as possible on
 the underlying experimental design.
 
 ```{r pheno, echo=FALSE, message=FALSE}
-tmpdf <- data.frame("Identifer"=colnames(se),
-                    "Cell line"=se$cell_line,
-                    Treatment=se$treatment,
-                    Replicate=se$description,
+tmpdf <- data.frame("Patient"=colData(se)$idFac,
+                    "lacStage"=colData(se)$lacStageFac,
+                    "protocol"=colData(se)$protocolFac,
                     check.names=FALSE)
 ktab <- kable(tmpdf, caption="Phenotypic variables.")
 kable_styling(ktab, position="center")
 ```
 
-This table reflects the comments in variable `data_processing.2`, which
-says "`r as.character(se$data_processing.2[1])`". In other words,
-infected samples should be compared with their *corresponding* mock
-samples. We can generate such a grouping variable with some more
-informative levels, as follows.
-
-```{r}
-se$samplegroup <- factor(sapply(strsplit(as.character(se$description),
-                                         "-"), function(x) x[1]))
-levels(se$samplegroup) <- c("IAVA549", "COV2A549", "COV2NHBE", "RSVA549")
-table(se$samplegroup)
-```
 
 ## Sequencing depth
 
