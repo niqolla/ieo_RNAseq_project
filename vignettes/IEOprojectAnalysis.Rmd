@@ -57,7 +57,7 @@ The option 'message=FALSE' avoid dumping R messages such as "Loading required pa
 into the output of the report.
 -->
 
-```{r, message=FALSE}
+```{r message=FALSE}
 library(SummarizedExperiment)
 
 se <- readRDS(file.path(system.file("extdata",
@@ -95,11 +95,27 @@ that among the `ncol(se)` samples we have technical replicates. We can
 figure out how many technical replicates per GSM sample we have as
 follows:
 
-```{r}
+```{r include=FALSE}
+# extract the colData from the SingleCellExperiment object
+coldata <- colData(se)
+
+# loop over the columns and count unique values
+for (col in names(coldata)) {
+  unique_vals <- unique(coldata[[col]])
+  if (any(length(unique_vals) %in% c(1, 16))) {
+    next # skip to the next column
+  } else {
+    counts <- table(coldata[[col]])
+    cat(paste0("Column '", col, "' has ", length(unique_vals), " unique values:\n"))
+    print(counts)
+  }
+}
+
+
 
 ```
 
-
+blabla
 
 
 
@@ -111,7 +127,7 @@ table(lengths(split(colnames(se), se$geo_accession)))
 So, we have `r length(unique(se$geo_accession))` different individual
 samples and for each of them, we have only 
 `r names(table(lengths(split(colnames(se), se$geo_accession))))`
-technical replicates. 
+technical replicate. 
 <!--
 We proceed now to add up the counts of the
 tecnical replicates per sample. For this purpose, we use the function
@@ -143,7 +159,7 @@ additional assay element to ease their manipulation.
 assays(se)$logCPM <- cpm(dge, log=TRUE)
 assays(se)$logCPM[1:5, 1:5]
 ```
-
+<!--
 Let's explore now some of the phenotypic variables. Unfortunately,
 we do not have rich metadata that tells us what precise information
 is stored in each variable. However, after some visual inspection,
@@ -155,6 +171,8 @@ treatment.
 table(se$characteristics_ch1)
 table(se$characteristics_ch1.2)
 ```
+--->
+
 To facilitate handling these variables we are going to recode them
 as follows.
 
