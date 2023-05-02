@@ -164,29 +164,17 @@ follows.
 First we replace spaces in column names
 
 ```{r}
-
+# simpler names
 names(colData(se))[37] <- "id"
 names(colData(se))[36] <- "lacStage"
 names(colData(se))[35] <- "protocol"
+
+# creating factors
+colData(se)$idFac <- factor(colData(se)$id)
+colData(se)$lacStageFac <- factor(colData(se)$lacStage)
+colData(se)$protocolFac <- factor(colData(se)$protocol)
 ```
 
-
-```{r}
-se$cell_line <- se$characteristics_ch1
-levels(se$cell_line) <- c("A549", "NHBE")
-se$treatment <- se$characteristics_ch1.2
-tmplevels <- gsub(" treatment", "", gsub("treatment: ", "", levels(se$treatment)))
-tmplevels <- gsub(" infected ", "", tmplevels)
-tmplevels <- gsub("\\(MOI ", "MOI", gsub(")", "", gsub("-", "", tmplevels)))
-levels(se$treatment) <- tmplevels
-```
-
-We can also identify some variables associated with technical factors,
-such as the sample preparation protocol in `extract_protocol_ch1`.
-
-```{r}
-table(se$extract_protocol_ch1)
-```
 
 Finally, we also observe that the variable `description` contains some
 relevant information about an apparent sub-grouping of the samples,
