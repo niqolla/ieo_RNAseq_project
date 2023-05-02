@@ -58,12 +58,14 @@ into the output of the report.
 -->
 
 ```{r message=FALSE}
+print("test")
 library(SummarizedExperiment)
 
 se <- readRDS(file.path(system.file("extdata",
                                     package="IEOproject"),
                         "GSE45669.rds"))
 se
+
 ```
 
 We have `r nrow(se)` genes by `r ncol(se)` samples. From the first row
