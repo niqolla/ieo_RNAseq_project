@@ -64,9 +64,8 @@ into the output of the report.
 ```
 ```{r message=FALSE}
 library(SummarizedExperiment)
-
-# se <- readRDS(file.path(system.file("inst/extdata", package="IEOproject"), "GSE45669.rds"))
-se <- readRDS("../inst/extdata/GSE45669.rds")
+se <- readRDS(file.path(system.file("extdata", package="IEOproject"), "GSE45669.rds"))
+#se <- readRDS("../inst/extdata/GSE45669.rds")
 
 se
 
@@ -100,21 +99,42 @@ second column `geo_accession` contains GEO Sample Accession Number
 ([GSM](https://www.ncbi.nlm.nih.gov/geo/info/overview.html)) identifers.
 GSM identifiers define individual samples, understood in our context as
 individual sources of RNA. We can see these are repeated, indicating
-that among the `ncol(se)` samples we have technical replicates. We can
-figure out how many technical replicates per GSM sample we have as
-follows:
+that among the `ncol(se)` samples we have technical replicates. 
+
+
+To proceed further exploring this dataset, we are going to use the
+[edgeR](https://bioconductor.org/packages/edgeR) package and build a
+`DGEList` object, incorporating the gene metadata, which includes the
+gene symbol.
+
+```{r, message=FALSE}
+library(IEOproject)
+library(edgeR)
+
+dge <- DGEList(counts=assays(se)$counts, genes=rowData(se))
+dim(dge)
+```
+
+Calculate $\log_2$ CPM units of expression and put them as an additional
+assay element to ease their manipulation.
 
 ```{r}
-# extract the colData from the SingleCellExperiment object
-coldata <- colData(se)
+assays(se)$logCPM <- cpm(dge, log=TRUE)
+assays(se)$logCPM[1:5, 1:5]
+```
+
+posible groups:
+
+
+```{r}
 
 # loop over the columns and count unique values
-for (col in names(coldata)) {
-  unique_vals <- unique(coldata[[col]])
+for (col in names(colData(se))) {
+  unique_vals <- unique(colData(se)[[col]])
   if (any(length(unique_vals) %in% c(1, 16))) {
     next # skip to the next column
   } else {
-    counts <- table(coldata[[col]])
+    counts <- table(colData(se)[[col]])
     cat(paste0("Column '", col, "' has ", length(unique_vals), " unique values:\n"))
     print(counts)
   }
@@ -138,45 +158,18 @@ there are:
 * because of the different protocols there are 4 different groups (technically relevant)
   Hard spin, Unwashed ; Hard spin, Washed once ; Hard spin, Washed twice ; Soft spin, Unwashed
 
-To proceed further exploring this dataset, we are going to use the
-[edgeR](https://bioconductor.org/packages/edgeR) package and build a
-`DGEList` object, incorporating the gene metadata, which includes the
-gene symbol.
-
-```{r, message=FALSE}
-library(IEOproject)
-library(edgeR)
-
-dge <- DGEList(counts=assays(se)$counts, genes=rowData(se))
-dim(dge)
-```
-
-Calculate $\log_2$ CPM units of expression and put them as an additional
-assay element to ease their manipulation.
-
-```{r}
-assays(se)$logCPM <- cpm(dge, log=TRUE)
-assays(se)$logCPM[1:5, 1:5]
-```
-
-````{=html}
-<!--
-Let's explore now some of the phenotypic variables. Unfortunately,
-we do not have rich metadata that tells us what precise information
-is stored in each variable. However, after some visual inspection,
-we would find out that the variables `characteristics_ch1` and
-`characteristics_ch1.2` contain the information about cell line and
-treatment.
-
-```{r}
-table(se$characteristics_ch1)
-table(se$characteristics_ch1.2)
-```
---->
-````
-
 To facilitate handling these variables we are going to recode them as
 follows.
+
+First we replace spaces in column names
+
+```{r}
+
+names(colData(se))[37] <- "id"
+names(colData(se))[36] <- "lacStage"
+names(colData(se))[35] <- "protocol"
+```
+
 
 ```{r}
 se$cell_line <- se$characteristics_ch1
