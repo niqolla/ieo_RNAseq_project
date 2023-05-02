@@ -1,9 +1,8 @@
 ---
-title: "IEO Project template"
+title: "RNA Sequencing of the Human Milk Fat Layer Transcriptome Reveals Distinct Gene Expression Profiles at Three Stages of Lactation"
 author:
-- name: "Robert Castelo"
+- name: "Nikola Panajotovikj, Ester Muñoz del Campo, Marko Ludaic"
   affiliation: Universitat Pompeu Fabra
-  email: robert.castelo@upf.edu
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
@@ -46,98 +45,6 @@ options(usethis.quiet=TRUE)
 ```
 
 # Introduction
-
-The severe acute respiratory syndrome-related coronavirus 2 (SARS-CoV-2)
-is a highly pathogenic human zoonotic
-[coronavirus](https://en.wikipedia.org/wiki/Coronavirus), which causes
-Coronavirus disease 2019 (COVID-19). In an effort to understand the host
-transcriptional response to the SARS-Cov-2 virus, @blancomelo20 sequenced the
-transcriptome of two different human cell lines, human alveolar adenocarcinoma
-cells (A549) and primary human bronchial epithelial (NHBE) cells, after
-infecting them with SARS-Cov-2, seasonal influenza A virus (IAV) and human
-respiratory syncytial virus (RSV), and growing them in the same culture
-conditions without infection (mock).
-
-The resulting raw RNA-seq data have been deposited at the Gene Expression
-Omnibus (GEO), where they are publicly available under accession
-[GSE147507](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147507).
-Here, we show a first exploratory analysis of the corresponding RNA-seq gene
-expression profiles generated as a table of counts using the DEE2
-(https://dee2.io) pipeline by @ziemann19, and further packaged into a
-[SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment)
-object with genes mapped to Entrez identifiers. This object also stores
-the phenotypic information about the profiled samples that has been also
-made available at GEO.
-
-The directories in this package template follow the structure of an R package
-(consult this [link](http://r-pkgs.had.co.nz) for further information) adapted
-for the purpose of data analysis:
-
-  * R: functions to avoid repeating steps and store auxiliary code,
-  used in the vignette.
-  
-  * vignettes: Rmarkdown document of the data analysis.
-  
-  * inst/extdata: repository of the data to be analyzed and any other
-  kind of additional functional and annotation data employed during
-  the analysis and which is unavailable through an R package. This
-  directory is moved to the package root directory at install.
-  
-  * inst/doc: repository for the results of the analysis that we
-  want to provide without having to run the entire analysis again, e.g.,
-  tables of differentially expressed genes. This directory is moved
-  to the package root directory at install, where also the vignettes
-  are installed.
-  
-  * man: manual pages of functions defined in the R directory that
-  for some reason we want to export from the package.
-  
-Every other directory you see in this package has been automatically
-generated in the package building process as, for instance, the `doc`
-directory with the result of the vignette.
-
-When you edit and adapt this vignette for your own data analysis project,
-you should do it in the `.Rmd` file of the `vignettes` directory
-(**not** the one copied to the `doc` directory because this one is overwritten
-during package building and if you edit there **you will loose your edits**).
-To build this vignette without building the entire package, you should type
-the following in the R shell:
-
-```{r, eval=FALSE}
-devtools::build_vignettes()
-```
-
-This function call will build your vignette and copy the resulting HTML to
-the `doc` directory. Thus, to see the result, you should go there and open
-that HTML file.
-
-The rest of the documentation of this package is provided within the files
-of the R directory using
-[roxygen2](https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html),
-which means that before you build the entire package you have to generate the
-documentation and `NAMESPACE` file typing in the R shell:
-
-```{r, eval=FALSE}
-devtools::document()
-```
-
-Both steps, calling `devtools::build_vignettes()` and `devtools::document()`
-have to be done from the root directory of your package.
-
-**IMPORTANT**: This package template is just an example to facilitate getting
-started with R-markdown, illustrate the encapsulation of a data analysis into
-an R package and provide an example of a possible structure of the data analysis
-for the the project. You do *not* have to do the analysis of your dataset
-exactly in the same way as it is done here. Please read carefully the
-description of the project, and its technical requirements to know what you are
-expected to do. In particular, when you carry out the second part of the
-project, you should conduct the differential expression analysis in the way that
-best suits the questions you want to address. You do not need to do the analysis
-in every possible way, just in one way, in the way you think it makes more sense
-to you.
-
-IF YOU THINK AN ANALYSIS OR A DIAGNOSTIC OR A VISUALIZATION
-DOES NOT MAKE SENSE, OR IT IS NOT JUSTIFIED, **YOU SHOULD NOT DO IT**.
 
 # Quality assessment
 
