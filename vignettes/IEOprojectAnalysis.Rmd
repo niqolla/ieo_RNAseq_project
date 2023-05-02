@@ -62,7 +62,7 @@ library(SummarizedExperiment)
 
 se <- readRDS(file.path(system.file("extdata",
                                     package="IEOproject"),
-                        "GSE147507.rds"))
+                        "GSE45669.rds"))
 se
 ```
 
@@ -96,14 +96,24 @@ figure out how many technical replicates per GSM sample we have as
 follows:
 
 ```{r}
+
+```
+
+
+
+
+
+```{r}
 length(unique(se$geo_accession))
 table(lengths(split(colnames(se), se$geo_accession)))
 ```
 
 So, we have `r length(unique(se$geo_accession))` different individual
-samples and for each of them, we have
+samples and for each of them, we have only 
 `r names(table(lengths(split(colnames(se), se$geo_accession))))`
-technical replicates. We proceed now to add up the counts of the
+technical replicates. 
+<!--
+We proceed now to add up the counts of the
 tecnical replicates per sample. For this purpose, we use the function
 `add_tech_rep()` defined in this package.
 
@@ -113,13 +123,14 @@ library(IEOproject)
 se <- add_tech_rep(se, se$geo_accession)
 se
 ```
-
+--->
 To proceed further exploring this dataset, we are going to use the
 [edgeR](https://bioconductor.org/packages/edgeR) package and build
 a `DGEList` object, incorporating the gene metadata, which includes
 the gene symbol.
 
 ```{r, message=FALSE}
+library(IEOproject)
 library(edgeR)
 
 dge <- DGEList(counts=assays(se)$counts, genes=rowData(se))
