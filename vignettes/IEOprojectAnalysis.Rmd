@@ -213,6 +213,9 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01)
 ```
+From the plot above we don't notice any biases related to the different lactation stages. The only thing that stands out is SRR801705 as having very low sequence depth. In the later part of the analysis we will remove it since it seems to be an error.
+
+
 ```{r}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
@@ -223,7 +226,7 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
 legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"), 
        fill=c("blue", "green", "red", "orange"), inset=0.01)
 ```
-
+From the plot above we do not see any bias. The "Hard spin, Washed once" group together but there doesn't seem to be an significantly extreme difference in their sequencing depth. We will further analyse this with a clusering approach. 
 
 ```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
 
@@ -284,6 +287,8 @@ in nearly all samples and another for genes with some detectable levels
 of expression across a number of samples.
 
 ## Filtering of lowly-expressed genes
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE SRR801705
 
 We filter lowly-expressed genes using the function `filterByExpr()`,
 grouping by sample-group to define the minimum number of samples in
