@@ -173,8 +173,16 @@ names(colData(se))[35] <- "protocol"
 
 # creating factors
 colData(se)$idFac <- factor(colData(se)$id)
-colData(se)$lacStageFac <- factor(colData(se)$lacStage)
-colData(se)$protocolFac <- factor(colData(se)$protocol)
+# colData(se)$lacStageFac <- factor(colData(se)$lacStage)
+colData(se)$lacStageFac <- factor(colData(se)$lacStage,
+                                  levels = c("Colostrum", "Transitional", "Mature"),
+                                  labels = c(1, 2, 3))
+
+#colData(se)$protocolFac <- factor(colData(se)$protocol)
+colData(se)$protocolFac <- factor(colData(se)$protocol,
+                                  levels = c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"),
+                                  labels = c(1, 2, 3, 4 ))
+
 ```
 
 In Table \@ref(tab:pheno) below, we show this variable jointly with cell
@@ -202,9 +210,20 @@ ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
 names(ordmreads) <- colnames(se)[ord]
 bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
-              xlab="", col=c("blue", "red", "green")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
+              xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01)
 ```
+```{r}
+par(mar=c(7, 5, 2, 2))
+ord <- order(dge$sample$lib.size/1e6)
+ordmreads <- dge$sample$lib.size[ord]/1e6
+names(ordmreads) <- colnames(se)[ord]
+bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
+              xlab="", col=c("blue", "green", "red", "orange")[colData(se)$protocolFac[ord]], las=2, ylim = c(0, 60))
+legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"), 
+       fill=c("blue", "green", "red", "orange"), inset=0.01)
+```
+
 
 ```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
 
