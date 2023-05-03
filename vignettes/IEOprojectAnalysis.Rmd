@@ -485,6 +485,7 @@ cultured to match the conditions of the corresponding infected samples.
 For this reason, in this dataset it only makes sense to compare infected
 with mock samples within their corresponding cultured group.
 
+
 # Differential expression
 
 We perform a simple assessment of the extent of expression changes and
