@@ -213,7 +213,7 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01)
 ```
-From the plot above we don't notice any biases related to the different lactation stages. The only thing that stands out is SRR801705 as having very low sequence depth. In the later part of the analysis we will remove it since it seems to be an error.
+From the plot above we don't notice any biases related to the different lactation stages. The only thing that stands out is SRR801705 as having very low sequence depth. In the later part of the analysis we will remove it from the analysis, since it seems to be an error.
 
 
 ```{r}
@@ -260,6 +260,19 @@ cex.axis=1.2, cex.lab=1.5, las=2)
 
 ```
 In the previous plots we see that the SRR801705 sample does not behave differently than the rest, but this is due to the fact that we are now considering the counts per million (CPM), and what is wrong about that sample is the sequencing depth, so still we will exclude it from the analysis.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE SRR801705
+
+```{r}
+# Create logical mask excluding column containing "SRR801705" in the name
+mask <- !grepl("SRR801705", colnames(se))
+
+# Subset the data frame using the mask
+se_sample_filtered <- se[, mask]
+
+```
+
+
 ## Distribution of expression levels among genes
 
 Let's calculate now the average expression per gene through all the
@@ -277,7 +290,6 @@ of expression across a number of samples.
 
 ## Filtering of lowly-expressed genes
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! REMOVE SRR801705
 
 We filter lowly-expressed genes using the function `filterByExpr()`,
 grouping by sample-group to define the minimum number of samples in
