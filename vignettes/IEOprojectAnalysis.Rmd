@@ -196,15 +196,6 @@ read counts mapped to the genome per sample. Figure \@ref(fig:libsizes)
 below shows the sequencing depth per sample, also known as library
 sizes, in increasing order.
 
-```{=html}
-<!---
-you can control the height and width in pixels of the figure with
-'out.height' and 'out.width'. Figures are automatically numbered,
-to refer to them in the main text you should use the notation shown
-above as \@ref(fig:xxxx) with xxxx being the label in the code chunk
-that also gives the filename of the figure. This name must be unique
---->
-```
 ```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)

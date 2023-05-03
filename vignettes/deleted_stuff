@@ -90,3 +90,15 @@ to you.
 
 IF YOU THINK AN ANALYSIS OR A DIAGNOSTIC OR A VISUALIZATION
 DOES NOT MAKE SENSE, OR IT IS NOT JUSTIFIED, **YOU SHOULD NOT DO IT**.
+
+
+
+```{=html}
+<!---
+you can control the height and width in pixels of the figure with
+'out.height' and 'out.width'. Figures are automatically numbered,
+to refer to them in the main text you should use the notation shown
+above as \@ref(fig:xxxx) with xxxx being the label in the code chunk
+that also gives the filename of the figure. This name must be unique
+--->
+```

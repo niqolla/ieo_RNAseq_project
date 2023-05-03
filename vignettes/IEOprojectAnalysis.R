@@ -28,23 +28,6 @@ head(rowData(se))
 dim(colData(se))
 head(colData(se), n=3)
 
-## -----------------------------------------------------------------------------
-# extract the colData from the SingleCellExperiment object
-coldata <- colData(se)
-
-# loop over the columns and count unique values
-for (col in names(coldata)) {
-  unique_vals <- unique(coldata[[col]])
-  if (any(length(unique_vals) %in% c(1, 16))) {
-    next # skip to the next column
-  } else {
-    counts <- table(coldata[[col]])
-    cat(paste0("Column '", col, "' has ", length(unique_vals), " unique values:\n"))
-    print(counts)
-  }
-}
-
-
 ## ---- message=FALSE-----------------------------------------------------------
 library(IEOproject)
 library(edgeR)
@@ -57,21 +40,36 @@ assays(se)$logCPM <- cpm(dge, log=TRUE)
 assays(se)$logCPM[1:5, 1:5]
 
 ## -----------------------------------------------------------------------------
-table(se$characteristics_ch1)
-table(se$characteristics_ch1.2)
+
+# loop over the columns and count unique values
+for (col in names(colData(se))) {
+  unique_vals <- unique(colData(se)[[col]])
+  if (any(length(unique_vals) %in% c(1, 16))) {
+    next # skip to the next column
+  } else {
+    counts <- table(colData(se)[[col]])
+    cat(paste0("Column '", col, "' has ", length(unique_vals), " unique values:\n"))
+    print(counts)
+  }
+}
+
 
 ## -----------------------------------------------------------------------------
-se$cell_line <- se$characteristics_ch1
-levels(se$cell_line) <- c("A549", "NHBE")
-se$treatment <- se$characteristics_ch1.2
-tmplevels <- gsub(" treatment", "", gsub("treatment: ", "", levels(se$treatment)))
-tmplevels <- gsub(" infected ", "", tmplevels)
-tmplevels <- gsub("\\(MOI ", "MOI", gsub(")", "", gsub("-", "", tmplevels)))
-levels(se$treatment) <- tmplevels
+# simpler names
+names(colData(se))[37] <- "id"
+names(colData(se))[36] <- "lacStage"
+names(colData(se))[35] <- "protocol"
 
-## -----------------------------------------------------------------------------
-table(se$extract_protocol_ch1)
+# creating factors
+colData(se)$idFac <- factor(colData(se)$id)
+colData(se)$lacStageFac <- factor(colData(se)$lacStage)
+colData(se)$protocolFac <- factor(colData(se)$protocol)
 
-## -----------------------------------------------------------------------------
-se$description
+## ----pheno, echo=FALSE, message=FALSE-----------------------------------------
+tmpdf <- data.frame("Patient"=colData(se)$idFac,
+                    "lacStage"=colData(se)$lacStageFac,
+                    "protocol"=colData(se)$protocolFac,
+                    check.names=FALSE)
+ktab <- kable(tmpdf, caption="Phenotypic variables.")
+kable_styling(ktab, position="center")
 
