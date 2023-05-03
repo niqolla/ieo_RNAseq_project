@@ -190,9 +190,9 @@ line and treatment to try to gather as much understanding as possible on
 the underlying experimental design.
 
 ```{r pheno, echo=FALSE, message=FALSE}
-tmpdf <- data.frame("Patient"=colData(se)$idFac,
-                    "lacStage"=colData(se)$lacStageFac,
-                    "protocol"=colData(se)$protocolFac,
+tmpdf <- data.frame("Patient"=colData(se)$id,
+                    "lacStage"=colData(se)$lacStage,
+                    "protocol"=colData(se)$protocol,
                     check.names=FALSE)
 ktab <- kable(tmpdf, caption="Phenotypic variables.")
 kable_styling(ktab, position="center")
@@ -270,7 +270,7 @@ mask <- !grepl("SRR801705", colnames(se))
 # Subset the data frame using the mask
 se_sample_filtered <- se[, mask]
 
-# the same for the samples in the dge object
+# The same for the samples in the dge object
 mask <- rownames(dge$samples) != "SRR801705"
 dge_sample_filtered <- dge
 dge$samples_masked <- dge$samples[mask, ]

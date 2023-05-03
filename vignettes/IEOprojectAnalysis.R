@@ -120,6 +120,11 @@ mask <- !grepl("SRR801705", colnames(se))
 # Subset the data frame using the mask
 se_sample_filtered <- se[, mask]
 
+# the same for the samples in the dge object
+mask <- rownames(dge$samples) != "SRR801705"
+dge_sample_filtered <- dge
+dge$samples_masked <- dge$samples[mask, ]
+dge_sample_filtered$samples <- dge$samples_masked
 
 ## ----exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."----
 avgexp <- rowMeans(assays(se_sample_filtered)$logCPM)
