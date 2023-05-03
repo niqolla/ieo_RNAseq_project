@@ -280,8 +280,8 @@ samples. Figure \@ref(fig:exprdist) shows the distribution of those
 values across genes.
 
 ```{r exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."}
-avgexp <- rowMeans(assays(se)$logCPM)
-hist(avgexp, xlab="log2 CPM", main="", las=1)
+avgexp <- rowMeans(assays(se_sample_filtered)$logCPM)
+hist(avgexp, xlab="log2 CPM", main="", las=1, ylim=c(0,7000))
 ```
 
 As expected, we have two modes, one for genes that are lowly expressed
