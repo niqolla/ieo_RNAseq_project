@@ -228,24 +228,6 @@ legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Wa
 ```
 From the plot above we do not see any bias. The "Hard spin, Washed once" group together but there doesn't seem to be an significantly extreme difference in their sequencing depth. We will further analyse this with a clusering approach. 
 
-```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
-
-mockmask <- se$treatment[ord] == "Mock"
-text(bp[mockmask, 1], dge$sample$lib.size[ord][mockmask]/1e6, "M", pos=3)
-legend("topleft", c(levels(se$samplegroup), "Mock"), inset=0.05,
-       pch=c(rep(15, nlevels(se$samplegroup)), 77), ## 77 is ASCII for M
-       col=c(seq_len(nlevels(se$samplegroup)), "black"))
-```
-
-We see substantial differences in sequencing depth, ranging from
-`r round(min(dge$sample$lib.size/1e6), digits=0)` to
-`r round(max(dge$sample$lib.size/1e6), digits=0)` million reads. Except
-for the IAV-A549 samples, which seem to have been all sequenced at a
-lower depth than the rest (\< 10M), the other sample groups are not
-confounded with sequencing depth. Within sample groups, the RSV-549 mock
-samples were sequenced at a substantially higher depth than the
-RSV-infected ones.
-
 ## Distribution of expression levels among samples
 
 Figure \@ref(fig:distRawExp) below shows the distribution of expression
