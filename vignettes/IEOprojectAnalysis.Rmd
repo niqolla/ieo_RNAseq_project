@@ -253,6 +253,13 @@ multidensity(lst, xlab="log 2 CPM", legend=NULL,
 There are no substantial differences between the samples in the
 distribution of expression values.
 
+```{r}
+par(mar=c(7, 5, 2, 2))
+boxplot(assays(se)$logCPM, col="gray", ylab=expression(log[2] * "CPM"),
+cex.axis=1.2, cex.lab=1.5, las=2)
+
+```
+
 ## Distribution of expression levels among genes
 
 Let's calculate now the average expression per gene through all the
