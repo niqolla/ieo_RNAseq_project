@@ -74,9 +74,9 @@ colData(se)$protocolFac <- factor(colData(se)$protocol,
 
 
 ## ----pheno, echo=FALSE, message=FALSE-----------------------------------------
-tmpdf <- data.frame("Patient"=colData(se)$idFac,
-                    "lacStage"=colData(se)$lacStageFac,
-                    "protocol"=colData(se)$protocolFac,
+tmpdf <- data.frame("Patient"=colData(se)$id,
+                    "lacStage"=colData(se)$lacStage,
+                    "protocol"=colData(se)$protocol,
                     check.names=FALSE)
 ktab <- kable(tmpdf, caption="Phenotypic variables.")
 kable_styling(ktab, position="center")
@@ -120,7 +120,7 @@ mask <- !grepl("SRR801705", colnames(se))
 # Subset the data frame using the mask
 se_sample_filtered <- se[, mask]
 
-# the same for the samples in the dge object
+# The same for the samples in the dge object
 mask <- rownames(dge$samples) != "SRR801705"
 dge_sample_filtered <- dge
 dge$samples_masked <- dge$samples[mask, ]
@@ -129,32 +129,4 @@ dge_sample_filtered$samples <- dge$samples_masked
 ## ----exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."----
 avgexp <- rowMeans(assays(se_sample_filtered)$logCPM)
 hist(avgexp, xlab="log2 CPM", main="", las=1, ylim=c(0,7000))
-
-## -----------------------------------------------------------------------------
-mask <- filterByExpr(dge, group=se$samplegroup)
-se.filt <- se[mask, ]
-dim(se.filt)
-dge.filt <- dge[mask, ]
-dim(dge.filt)
-
-## -----------------------------------------------------------------------------
-dge.filt <- calcNormFactors(dge.filt)
-
-## -----------------------------------------------------------------------------
-assays(se.filt)$logCPM <- cpm(dge.filt, log=TRUE,
-                              normalized.lib.sizes=TRUE)
-
-## ----maPlots, fig.height=18, fig.width=10, dpi=100, echo=FALSE, fig.cap="MA-plots of filtered and normalized expression values."----
-par(mfrow=c(5, 4), mar=c(4, 5, 3, 1))
-for (i in 1:ncol(se.filt)) {
-  A <- rowMeans(assays(se.filt)$logCPM)
-  M <- assays(se.filt)$logCPM[, i] - A
-  smoothScatter(A, M, main=colnames(se.filt)[i], las=1)
-  abline(h=0, col="blue", lwd=2)
-  lo <- lowess(M ~ A)
-  lines(lo$x, lo$y, col="red", lwd=2)
-}
-
-## -----------------------------------------------------------------------------
-table(se.filt$cell_line, se.filt$treatment)
 
