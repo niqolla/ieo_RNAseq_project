@@ -99,8 +99,7 @@ second column `geo_accession` contains GEO Sample Accession Number
 ([GSM](https://www.ncbi.nlm.nih.gov/geo/info/overview.html)) identifers.
 GSM identifiers define individual samples, understood in our context as
 individual sources of RNA. We can see these are repeated, indicating
-that among the `ncol(se)` samples we have technical replicates. 
-
+that among the `ncol(se)` samples we have technical replicates.
 
 To proceed further exploring this dataset, we are going to use the
 [edgeR](https://bioconductor.org/packages/edgeR) package and build a
@@ -125,7 +124,6 @@ assays(se)$logCPM[1:5, 1:5]
 
 posible groups:
 
-
 ```{r}
 
 # loop over the columns and count unique values
@@ -142,7 +140,7 @@ for (col in names(colData(se))) {
 
 ```
 
-NOTE: replace hard-coded values with the r {} 
+NOTE: replace hard-coded values with the r {}
 
 In the output above is from code that goes through all the different
 columns and returns the unique values and their count, given that the
@@ -150,13 +148,17 @@ whole colum is not the same value or has all different values. Our idea
 for this is to see if there are any groups in the data. We can see that
 there are:
 
-* patients that are repeated because their milk was sampled in 2 or 3 of the  3 stages of lactation reported in the paper (id numbers: 179, 183, 187)
+-   patients that are repeated because their milk was sampled in 2 or 3
+    of the 3 stages of lactation reported in the paper (id numbers: 179,
+    183, 187)
 
-* given the different 3 stages, 3 groups of samples appear (this is a biologically relevant factor)
-  lactation stage: Colostrum       lactation stage: Mature lactation stage: Transitional
-  
-* because of the different protocols there are 4 different groups (technically relevant)
-  Hard spin, Unwashed ; Hard spin, Washed once ; Hard spin, Washed twice ; Soft spin, Unwashed
+-   given the different 3 stages, 3 groups of samples appear (this is a
+    biologically relevant factor) lactation stage: Colostrum lactation
+    stage: Mature lactation stage: Transitional
+
+-   because of the different protocols there are 4 different groups
+    (technically relevant) Hard spin, Unwashed ; Hard spin, Washed once
+    ; Hard spin, Washed twice ; Soft spin, Unwashed
 
 To facilitate handling these variables we are going to recode them as
 follows.
@@ -188,21 +190,24 @@ ktab <- kable(tmpdf, caption="Phenotypic variables.")
 kable_styling(ktab, position="center")
 ```
 
-
 ## Sequencing depth
 
 Let's examine the sequencing depth in terms of total number of sequence
 read counts mapped to the genome per sample. Figure \@ref(fig:libsizes)
 below shows the sequencing depth per sample, also known as library
 sizes, in increasing order.
-
-```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
+```{r}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
 names(ordmreads) <- colnames(se)[ord]
 bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
-              xlab="", col=as.integer(se$samplegroup[ord]), las=2)
+              xlab="", col=c("blue", "red", "green")[colData(se)$lacStageFac[ord]], las=2)
+
+```
+
+```{r libsizes, echo=FALSE, height=8, width=8, out.width="600px", fig.cap="Library sizes in increasing order."}
+
 mockmask <- se$treatment[ord] == "Mock"
 text(bp[mockmask, 1], dge$sample$lib.size[ord][mockmask]/1e6, "M", pos=3)
 legend("topleft", c(levels(se$samplegroup), "Mock"), inset=0.05,
