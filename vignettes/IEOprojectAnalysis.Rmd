@@ -543,8 +543,8 @@ outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
 plotMDS(dge.filt, labels=outcome, col=batch)
-legend("topright", levels(se.filt$lacStageFac),
-       fill=seq_len(nlevels(se.filt$lacStageFac)), inset=0.05)
+legend("topright", levels(se.filt$protocolFac),
+       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05)
 ```
 
 The MDS plot shows even more clear differences between A549 and NHBE
@@ -564,8 +564,8 @@ compare mock with SARS-Cov-2 infected samples in the NHBE cell line. We
 first subset the data as follows:
 
 ```{r}
-se.filt.COV2NHBE <- se.filt[, se.filt$protocolFac]
-se.filt.COV2NHBE$treatment <- droplevels(se.filt.COV2NHBE$treatment)
+se.filt.all <- se.filt
+se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 ```
 
 In the second step above, we dropped the unused levels from the
@@ -574,9 +574,9 @@ levels that do not exist in this subset of the data. We build now the
 corresponding full and null model matrices.
 
 ```{r}
-mod <- model.matrix(~ se.filt.COV2NHBE$treatment,
-                    colData(se.filt.COV2NHBE))
-mod0 <- model.matrix(~ 1, colData(se.filt.COV2NHBE))
+mod <- model.matrix(~ se.filt.all$stage,
+                    colData(se.filt.all))
+mod0 <- model.matrix(~ 1, colData(se.filt.all))
 ```
 
 Finally, we conduct the F-test implemented in the package `sva` and
@@ -586,7 +586,7 @@ infected and mock cells.
 ```{r, message=FALSE}
 library(sva)
 
-pv <- f.pvalue(assays(se.filt.COV2NHBE)$logCPM, mod, mod0)
+pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 sum(p.adjust(pv, method="fdr") < 0.05)
 sum(p.adjust(pv, method="fdr") < 0.1)
 ```
