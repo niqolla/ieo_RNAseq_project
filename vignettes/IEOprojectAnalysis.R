@@ -197,6 +197,7 @@ table(se.filt$idFac, se.filt$protocolFac)
 table(se.filt$lacStageFac, se.filt$protocolFac)
 
 ## ----sampleClustering, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
 sampleClustering <- hclust(d)
@@ -205,6 +206,7 @@ sampleDendrogram <- as.dendrogram(sampleClustering, hang=0.1)
 names(batch) <- colnames(se.filt)
 outcome <- paste(se.filt$lacStageFac, colnames(se), sep="\n")
 names(outcome) <- colnames(se.filt)
+
 sampleDendrogram <- dendrapply(sampleDendrogram,
                                function(x, batch, labels) {
                                  if (is.leaf(x)) {
@@ -213,8 +215,10 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  }
                                  x
                                }, batch, outcome)
+
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
      cex=0.7)
+
 legend("topright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)))
 

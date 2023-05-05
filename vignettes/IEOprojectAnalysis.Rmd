@@ -118,7 +118,7 @@ Calculate $\log_2$ CPM units of expression and put them as an additional
 assay element to ease their manipulation.
 
 ```{r}
-assays(se)$logCPM <- cpm(dge, log=TRUE)
+assays(se)$logCPM <- cpm(dge, log=TRUE,  prior.count=0.25)
 assays(se)$logCPM[1:5, 1:5]
 ```
 
@@ -312,18 +312,53 @@ As expected, we have two modes, one for genes that are lowly expressed
 in nearly all samples and another for genes with some detectable levels
 of expression across a number of samples.
 
+
 ## Filtering of lowly-expressed genes
+
+```{r}
+
+#cpmcutoff <- round(10/min(dge_sample_filtered$sample$lib.size/1e6), digits=1)
+cpmcutoff <- 0.1
+print(cpmcutoff)
+
+#nsamplescutoff <- min(table(se_sample_filtered$protocolFac))
+nsamplescutoff<- 15 
+print(nsamplescutoff)
+
+mask <- rowSums(cpm(dge_sample_filtered) > cpmcutoff) >= nsamplescutoff
+
+se.filt <- se_sample_filtered[mask, ]
+dim(se.filt)
+dge.filt <- dge_sample_filtered[mask, ]
+dim(dge.filt)
+
+
+
+par(mar=c(4, 5, 1, 1))
+
+h <- hist(avgexp, xlab=expression("Expression level (" * log[2] * "CPM)"), 
+          main="", las=1, col="grey", cex.axis=1.2, cex.lab=1.5)
+
+x <- cut(rowMeans(assays(se.filt)$logCPM), breaks=h$breaks)
+
+lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
+
+legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
+
+
+
+```
 
 
 We filter lowly-expressed genes using the function `filterByExpr()`,
 grouping by sample-group to define the minimum number of samples in
 which a gene should be expressed.
-
+<!---
 We are left with `r nrow(se_sample_filtered)` genes.
 
 ```{r}
 
-mask <- filterByExpr(dge, group=colData(se_sample_filtered)$protocolFac)
+mask <- filterByExpr(dge_sample_filtered, group=colData(se_sample_filtered)$protocolFac)
 se.filt <- se_sample_filtered[mask, ]
 dim(se.filt)
 dge.filt <- dge_sample_filtered[mask, ]
@@ -349,7 +384,7 @@ legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
 ```
 
-
+--->
 
 
 ## Normalization
@@ -408,10 +443,6 @@ unexpected features, because then we might consider removing them.
 Here try to understand the underlying experimental design. Let's start
 examining the distribution of samples across the combination of cell
 line and treatment.
-
-```{r}
-table(se.filt$idFac, se.filt$protocolFac)
-```
 
 We can see that not all combinations of cell line and treatment have
 been sequenced. For this reason, we can anticipate that it won't be
@@ -474,12 +505,46 @@ depth and therefore, there's probably other reason than depth to cluster
 away from its group. In Figure \@ref(fig:mdsPlot) we show the
 corresponding MDS plot.
 
+
+
+```{r sampleClustering, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+par(mar=c(8, 5, 1, 1))
+logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
+d <- as.dist(1-cor(logCPM, method="spearman"))
+sampleClustering <- hclust(d)
+batch <- as.integer(se.filt$lacStageFac)
+sampleDendrogram <- as.dendrogram(sampleClustering, hang=0.1)
+names(batch) <- colnames(se.filt)
+outcome <- paste(se.filt$protocolFac, colnames(se), sep="\n")
+names(outcome) <- colnames(se.filt)
+
+sampleDendrogram <- dendrapply(sampleDendrogram,
+                               function(x, batch, labels) {
+                                 if (is.leaf(x)) {
+                                   attr(x, "nodePar") <- list(lab.col=as.vector(batch[attr(x, "label")]))
+                                   attr(x, "label") <- as.vector(labels[attr(x, "label")])
+                                 }
+                                 x
+                               }, batch, outcome)
+
+plot(sampleDendrogram, main="Hierarchical clustering of samples",
+     cex=0.7)
+
+legend("topright", levels(se.filt$lacStageFac),
+       fill=seq_len(nlevels(se.filt$lacStageFac)))
+```
+
+
+
+
+
 ```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
 outcome <- se.filt$lacStage
+batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
 plotMDS(dge.filt, labels=outcome, col=batch)
-legend("bottomleft", levels(se.filt$protocolFac),
-       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05)
+legend("topright", levels(se.filt$lacStageFac),
+       fill=seq_len(nlevels(se.filt$lacStageFac)), inset=0.05)
 ```
 
 The MDS plot shows even more clear differences between A549 and NHBE
