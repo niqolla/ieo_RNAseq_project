@@ -542,7 +542,7 @@ In fact, the samples group by lactation stage.
 
 # Differential expression
 
-We will study the differential expression between the lactation stages comparing them in groups of 2. So we will first compare Colostrum and Transitional stages, then Transitional and Mature and finally Colostrum and Mature.
+We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. Firstly, we observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we excluded colostrum stage (stage 1) and finally we excluded transitional stage (stage 2).
 
 ```{r}
 library(sva)
@@ -771,27 +771,17 @@ kable_styling(ktab, position="center")
 ```
 
 
-Differentially expressed genes in the three comparisons above we observe:
+The number of DE genes in the three comparisons above are:
 
 - Colostral-Transitional 7173 DE genes
 - Transitional-Mature 1463 DE genes
 - Colostral-Mature 8527 DE genes.
 
-These values we obtained are quite consistent with the reported DE genes from the atricle. Even the number are quite large, we think it makes sense because of the nature of the tissue. The milk should adap to the infant's needs.
 
-In the progression from colostral to
-transitional stages, 8015 genes
+It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
 
-7173
+As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
-and in the
-progression from transitional to mature stages, 1948 
-
-1463
-
-Comparing colostral directly to mature, there are 8817 
-
-8527
 
 
 # Functional analysis
