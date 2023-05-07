@@ -424,7 +424,7 @@ par(mfrow=c(5, 4), mar=c(4, 5, 3, 1))
 for (i in 1:ncol(se.filt)) {
   A <- rowMeans(assays(se.filt)$logCPM)
   M <- assays(se.filt)$logCPM[, i] - A
-  smoothScatter(A, M, main=colnames(se.filt)[i], las=1)
+  smoothScatter(A, M, main=colnames(se.filt)[i], las=1,cex.main=2.5)
   abline(h=0, col="blue", lwd=2)
   lo <- lowess(M ~ A)
   lines(lo$x, lo$y, col="red", lwd=2)
@@ -485,7 +485,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                }, batch, outcome)
 
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
-     cex=2.0, cex.axis=1.9)
+     cex=2.0, cex.axis=1.9, cex.main=1.9)
 
 legend("topright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)),cex=1.5)
@@ -515,7 +515,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                }, batch, outcome)
 
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
-     cex=1.8, cex.axis=1.9)
+     cex=1.8, cex.axis=1.9, cex.main=1.9)
 
 legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),cex=1.5)
@@ -580,7 +580,7 @@ expressed (DE) genes at FDR \< 5% and
 \@ref(fig:pdistCOV2NHBE) below we can see the distribution of the
 resulting p-values.
 
-```{r pdistCOV2NHBE, echo=FALSE, out.width="600px", fig.cap="Distribution of raw p-values for an F-test on every gene between SARS-Cov-2 infected and mock samples in NHBE cell lines."}
+```{r pdistCOV2NHBE, echo=FALSE, out.width="600px", fig.cap="Distribution of raw p-values for an F-test on every gene in the dataset between the 3 lactation stages."}
 hist(pv, main="", las=1)
 ```
 
@@ -635,7 +635,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 ## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
 ## and put its HTML code instead (&lt;)
 ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
-              caption=sprintf("Differentially expressed genes. Differentially expressed genes between SARS-Cov-2 infected and mock NHBE cells with FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
                               fnameCSV))
 ktab <- kable_styling(ktab,
                       bootstrap_options=c("stripped", "hover", "responsive"),
@@ -662,7 +662,7 @@ FDR < 10%, and put its HTML code instead (&lt;)
 ```
 ```{r DEgenesSARScov2NHBE, echo=FALSE}
 ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between SARS-Cov-2 infected and mock NHBE cells with FDR &lt; 10%%. To see the full list of DE genes, follow this <a href=\"%s\" target=\"_blank\">link</a> or download this CSV <a href=\"%s\" download>file</a>.",
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 ```

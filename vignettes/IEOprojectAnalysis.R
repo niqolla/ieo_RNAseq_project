@@ -98,7 +98,7 @@ ordmreads <- dge$sample$lib.size[ord]/1e6
 names(ordmreads) <- colnames(se)[ord]
 bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
-legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01)
+legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01, cex=0.85)
 
 
 ## ---- echo=FALSE--------------------------------------------------------------
@@ -109,7 +109,7 @@ names(ordmreads) <- colnames(se)[ord]
 bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red", "orange")[colData(se)$protocolFac[ord]], las=2, ylim = c(0, 60))
 legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"), 
-       fill=c("blue", "green", "red", "orange"), inset=0.01)
+       fill=c("blue", "green", "red", "orange"), inset=0.01, cex=0.85)
 
 
 ## ----distRawExp, echo=FALSE, fig.height=5, fig.width=5, out.width="600px", fig.cap="Non-parametric density distribution of expression profiles per sample.", message=FALSE----
@@ -164,7 +164,7 @@ dge_sample_filtered$counts <- dge_sample_filtered$counts[, mask]
 
 ## ----exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."----
 avgexp <- rowMeans(assays(se_sample_filtered)$logCPM)
-hist(avgexp, xlab="log2 CPM", main="", las=1, ylim=c(0,7000))
+hist(avgexp, xlab="log2 CPM", main="", las=1, ylim=c(0,8000))
 
 
 ## -----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ dim(dge.filt)
 par(mar=c(4, 5, 1, 1))
 
 h <- hist(avgexp, xlab=expression("Expression level (" * log[2] * "CPM)"), 
-          main="", las=1, col="grey", cex.axis=1.2, cex.lab=1.5)
+          main="", las=1, col="grey", cex.axis=0.95, cex.lab=1.2)
 
 x <- cut(rowMeans(assays(se.filt)$logCPM), breaks=h$breaks)
 
@@ -270,10 +270,10 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                }, batch, outcome)
 
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
-     cex=0.7)
+     cex=2.0, cex.axis=1.9)
 
 legend("topright", levels(se.filt$protocolFac),
-       fill=seq_len(nlevels(se.filt$protocolFac)))
+       fill=seq_len(nlevels(se.filt$protocolFac)),cex=1.5)
 
 
 ## ----sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
@@ -297,19 +297,19 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                }, batch, outcome)
 
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
-     cex=0.7)
+     cex=1.8, cex.axis=1.9)
 
 legend("topright", levels(se.filt$lacStageFac),
-       fill=seq_len(nlevels(se.filt$lacStageFac)))
+       fill=seq_len(nlevels(se.filt$lacStageFac)),cex=1.5)
 
 
 ## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."----
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
-plotMDS(dge.filt, labels=outcome, col=batch)
+plotMDS(dge.filt, labels=outcome, col=batch, cex=1.5)
 legend("topright", levels(se.filt$protocolFac),
-       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05)
+       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, cex=1.5)
 
 
 ## -----------------------------------------------------------------------------
