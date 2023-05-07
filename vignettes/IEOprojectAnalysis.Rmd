@@ -71,8 +71,6 @@ se
 
 ```
 
-This is a test comment!!
-
 We have `r nrow(se)` genes by `r ncol(se)` samples. From the first row
 and column names shown by the object, we can figure out that genes are
 defined by [Entrez](https://www.ncbi.nlm.nih.gov/gene) [@maglott10]
@@ -124,7 +122,7 @@ assays(se)$logCPM <- cpm(dge, log=TRUE,  prior.count=0.25)
 assays(se)$logCPM[1:5, 1:5]
 ```
 
-posible groups:
+To search for the possible factors, we now explore the column values:
 
 ```{r}
 
@@ -142,30 +140,26 @@ for (col in names(colData(se))) {
 
 ```
 
-NOTE: replace hard-coded values with the r {}
 
-In the output above is from code that goes through all the different
-columns and returns the unique values and their count, given that the
-whole colum is not the same value or has all different values. Our idea
-for this is to see if there are any groups in the data. We can see that
+In the output above we can observe the columns containing groups of data values, that means excluding the columns presenting the same value for all samples or a different value for each sample. We can see that
 there are:
 
 -   patients that are repeated because their milk was sampled in 2 or 3
-    of the 3 stages of lactation reported in the paper (id numbers: 179,
-    183, 187)
+    of the 3 stages of lactation reported in the paper (id numbers: `r `179,
+    183, 187).
 
 -   given the different 3 stages, 3 groups of samples appear (this is a
-    biologically relevant factor) lactation stage: Colostrum lactation
-    stage: Mature lactation stage: Transitional
+    biologically relevant factor): Colostrum lactation
+    stage; Mature lactation stage; Transitional lactation stage.
 
 -   because of the different protocols there are 4 different groups
     (technically relevant) Hard spin, Unwashed ; Hard spin, Washed once
-    ; Hard spin, Washed twice ; Soft spin, Unwashed
+    ; Hard spin, Washed twice ; Soft spin, Unwashed.
 
 To facilitate handling these variables we are going to recode them as
 follows.
 
-First we replace spaces in column names
+First we replace spaces in column names.
 
 ```{r}
 # simpler names
@@ -187,8 +181,7 @@ colData(se)$protocolFac <- factor(colData(se)$protocol,
 
 ```
 
-In Table \@ref(tab:pheno) below, we show this variable jointly with cell
-line and treatment to try to gather as much understanding as possible on
+In Table \@ref(tab:pheno) below, we show this variable jointly with lactation stage and protocol to try to gather as much understanding as possible on
 the underlying experimental design.
 
 ```{r pheno, echo=FALSE, message=FALSE}
@@ -206,7 +199,7 @@ Let's examine the sequencing depth in terms of total number of sequence
 read counts mapped to the genome per sample. Figure \@ref(fig:libsizes)
 below shows the sequencing depth per sample, also known as library
 sizes, in increasing order.
-```{r}
+```{r libsizes, echo=FALSE}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
@@ -215,10 +208,10 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01)
 ```
-From the plot above we don't notice any biases related to the different lactation stages. The only thing that stands out is SRR801705 as having very low sequence depth. In the later part of the analysis we will remove it from the analysis, since it seems to be an error.
 
+From the plot above we don't notice any biases related to the different lactation stages (colors). The only thing that stands out is SRR801705 as having very low sequencing depth. In the later part of the analysis we will remove it from the analysis, since it seems to be an error with the sample sequencing.
 
-```{r}
+```{r, echo=FALSE}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
@@ -228,7 +221,8 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
 legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"), 
        fill=c("blue", "green", "red", "orange"), inset=0.01)
 ```
-From the plot above we do not see any bias. The "Hard spin, Washed once" group together but there doesn't seem to be an significantly extreme difference in their sequencing depth. We will further analyse this with a clusering approach. 
+
+From the plot above we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
 
 ## Distribution of expression levels among samples
 
@@ -261,6 +255,7 @@ boxplot(assays(se)$logCPM, col="gray", ylab=expression(log[2] * "CPM"),
 cex.axis=1.2, cex.lab=1.5, las=2)
 
 ```
+
 In the previous plots we see that the SRR801705 sample does not behave differently than the rest, but this is due to the fact that we are now considering the counts per million (CPM), and what is wrong about that sample is the sequencing depth, so still we will exclude it from the analysis.
 
 ```{r}
@@ -354,7 +349,7 @@ legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
 We filter lowly-expressed genes using the function `filterByExpr()`,
 grouping by sample-group to define the minimum number of samples in
-which a gene should be expressed.
+which a gene should be expressed. We are left with `r nrow(se_sample_filtered)` genes.
 <!---
 We are left with `r nrow(se_sample_filtered)` genes.
 
@@ -443,30 +438,25 @@ unexpected features, because then we might consider removing them.
 ## Experimental design and batch identification
 
 Here try to understand the underlying experimental design. Let's start
-examining the distribution of samples across the combination of cell
-line and treatment.
+examining the distribution of samples across the combinations of lactation stage and protocol.
 
-We can see that not all combinations of cell line and treatment have
+We can see that not all combinations have
 been sequenced. For this reason, we can anticipate that it won't be
 possible to identify expression changes associated with all levels of
-these two factors. We will have to make comparisons within each cell
-line, between those treatments that have been sequenced.
+these two factors. We will have to make comparisons within each lactation stage, between those protocols that have been sequenced.
 
 Now, let's look at the combination of sample preparation protocol and
-cell line.
+lactation stage.
 
 ```{r}
 table(se.filt$lacStageFac, se.filt$protocolFac)
 ```
 
-We can see that there is a perfect correlation between sample
-preparation protocol and cell line because the two cell lines were
-processed with different sample preparation protocols. This means that
-differences between NHBE and A549 samples are not going to be only due
-to biological differences but also technical.
+We can see that not all the protocols have been used in all lactation stages, but still the distribution is quite balanced and the number of missing combinations is not critical for the analysis.
+This means that there are more chances that the differences observed are due to biological reasons rather than technical.
 
 We examine now how samples group together by hierarchical clustering and
-multidimensional scaling, annotating sample group and treatment. We
+multidimensional scaling, annotating lactation stage (number) and protocol(color) for each sample. We
 calculate again log CPM values with a high prior count(3) to moderate
 extreme fold-changes produced by low counts. The resulting dendrogram is
 shown in Figure \@ref(fig:sampleClustering).
@@ -498,15 +488,7 @@ legend("topright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)))
 ```
 
-As expected, NHBE cell line samples cluster separately from A549 samples
-and cell line seems to drive the largest portion of the variablity in
-the whole dataset. Next to this observation, all samples cluster by
-sample group, except one of the IAV-infected cells. Looking up its
-identifier, it does not correspond to the sample of lowest sequencing
-depth and therefore, there's probably other reason than depth to cluster
-away from its group. In Figure \@ref(fig:mdsPlot) we show the
-corresponding MDS plot.
-
+We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in Figure \@ref(fig:sampleClustering_1).
 
 
 ```{r sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
@@ -537,7 +519,9 @@ legend("topright", levels(se.filt$lacStageFac),
 ```
 
 
+We can clearly see that the samples group by lactation stage in the clustering, since each cluster contains samples from a lactation stage, with the only exception of the sample SRR801691.
 
+Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
 
 ```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
@@ -549,20 +533,15 @@ legend("topright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05)
 ```
 
-The MDS plot shows even more clear differences between A549 and NHBE
-samples and suggests clearly that samples group by the type of
-infection. As described by @blancomelo20, mock-treated samples were
-cultured to match the conditions of the corresponding infected samples.
-For this reason, in this dataset it only makes sense to compare infected
-with mock samples within their corresponding cultured group.
+In fact, the samples group by lactation stage.
 
 
 # Differential expression
 
 We perform a simple assessment of the extent of expression changes and
 their associated p-values using the F-test implemented in the
-R/Bioconductor package [sva](http://bioconductor.org/packages/sva). We
-compare mock with SARS-Cov-2 infected samples in the NHBE cell line. We
+R/Bioconductor package [sva](http://bioconductor.org/packages/sva). We will
+compare the expressiona among the lactation stages. We
 first subset the data as follows:
 
 ```{r}
@@ -582,8 +561,7 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 ```
 
 Finally, we conduct the F-test implemented in the package `sva` and
-examine the amount of differential expression between SARS-Cov-2
-infected and mock cells.
+examine the amount of differential expression between the 3 lactation stages.
 
 ```{r, message=FALSE}
 library(sva)
@@ -602,6 +580,8 @@ resulting p-values.
 ```{r pdistCOV2NHBE, echo=FALSE, out.width="600px", fig.cap="Distribution of raw p-values for an F-test on every gene between SARS-Cov-2 infected and mock samples in NHBE cell lines."}
 hist(pv, main="", las=1)
 ```
+
+The amount of differentially expressed genes is very high, in fact most of the studied genes are. This result might be due to the nature of the analyzed sample, since lactation milk can evolve during the lactation period in order to adapt to the baby's needs. Considering all this the result can be coherent.
 
 We build a table with the subset of
 `r sum(p.adjust(pv, method="fdr") < 0.1)` DE genes with FDR \< 10% and
