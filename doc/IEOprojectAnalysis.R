@@ -91,7 +91,7 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01, cex=0.85)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----libsizes_2, echo=FALSE---------------------------------------------------
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6

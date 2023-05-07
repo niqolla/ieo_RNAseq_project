@@ -60,9 +60,12 @@ Previous to this research, there has been attempt to undestand the human milk fa
 The authors of this paper, furthermore, suggest that the constitution of the human milk is not dependent on the days postpartum, which is the measure typically used by lactation researchers to categorize lactation stage. Rather, they state that compared to other factors such as subject, washing protocol, or time of collection, biochemically defined lactation stage (i.e., Na:K) has the largest effect on the transcriptome. So they categorise the samples as:  "colostral" if Na:K >= 2.0; and as "transitional" if Na:K  < 2.0;  "mature" if Na:K < 0.6 .
 
 The three main challanges of this paper are:
+
 * because of the sample extraction, it is unknown if the milk fat layer yields RNA purely of mammary epithelial cell origin, or if RNA from non-mammary epithelial sources is also present in the milk fat layer obtained from colostrum, transitional, or mature human milk, 
-* because of the body heat and the environment of the milk the RNA might end up being degraded (low RIN values),
-* 
+
+* because of the body heat and the environment of the milk, the RNA might end up being degraded (low RIN values),
+
+* because this is a study of patients who would agree to participate after just having gone through giving birth and have to fulfill some criteria, the sample size is very small which is something that really influences the information that can be extracted and extrapolated from this sample group - the result of bias of such a small sample group is really apparent in the MA-plots 
 
 
 # Quality assessment
@@ -139,7 +142,7 @@ assays(se)$logCPM <- cpm(dge, log=TRUE,  prior.count=0.25)
 assays(se)$logCPM[1:5, 1:5]
 ```
 
-To search for the possible factors, we now explore the column values:
+In the codeblock below, we loop through all the columns of the phenotype table to see if there are any variables for which there are groups (batch-effect):
 
 ```{r}
 
@@ -213,7 +216,7 @@ kable_styling(ktab, position="center")
 ## Sequencing depth
 
 Let's examine the sequencing depth in terms of total number of sequence
-read counts mapped to the genome per sample. Figure \@ref(libsizes:Fig)
+read counts mapped to the genome per sample. Figure \@ref(fig:libsizes)
 below shows the sequencing depth per sample, also known as library
 sizes, in increasing order.
 ```{r libsizes, echo=FALSE}
@@ -228,7 +231,7 @@ legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "gree
 
 From the plot above we don't notice any biases related to the different lactation stages (colors). The only thing that stands out is SRR801705 as having very low sequencing depth. In the later part of the analysis we will remove it from the analysis, since it seems to be an error with the sample sequencing.
 
-```{r, echo=FALSE}
+```{r libsizes_2, echo=FALSE}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
@@ -239,7 +242,7 @@ legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Wa
        fill=c("blue", "green", "red", "orange"), inset=0.01, cex=0.85)
 ```
 
-From the plot above we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
+From the plot above ( \@ref(fig:libsizes_2) ) we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
 
 ## Distribution of expression levels among samples
 
