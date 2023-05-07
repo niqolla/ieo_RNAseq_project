@@ -150,7 +150,7 @@ In the output above we can observe the columns containing groups of data values,
 there are:
 
 -   patients that are repeated because their milk was sampled in 2 or 3
-    of the 3 stages of lactation reported in the paper (id numbers: `r `179,
+    of the 3 stages of lactation reported in the paper (id numbers: 179,
     183, 187).
 
 -   given the different 3 stages, 3 groups of samples appear (this is a
@@ -562,8 +562,8 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
 ```{r, echo=FALSE}
@@ -582,9 +582,9 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
-In the following table the DE genes with lowest p-values are displayed:
+In the table \@ref(tab:CTtab) the DE genes with lowest p-values are displayed:
 
-```{r, echo=FALSE}
+```{r CTtab, echo=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -637,8 +637,8 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
 ```{r, echo=FALSE}
@@ -657,9 +657,9 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
-In the following table the DE genes with lowest p-values are displayed:
+In the table \@ref(tab:TMtab) the DE genes with lowest p-values are displayed:
 
-```{r, echo=FALSE}
+```{r TMtab, echo=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -711,8 +711,8 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
 ```{r}
@@ -731,9 +731,9 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
-In the following table the DE genes with lowest p-values are displayed:
+In the table \@ref(tab:CMtab) the DE genes with lowest p-values are displayed:
 
-```{r}
+```{r CMtab}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
