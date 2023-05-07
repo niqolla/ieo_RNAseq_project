@@ -538,9 +538,241 @@ legend("topright", levels(se.filt$protocolFac),
 
 In fact, the samples group by lactation stage.
 
-
+###### ========
 # Differential expression
 
+## Between Colostrum and Transitional
+```{r}
+se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
+se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
+
+mod <- model.matrix(~ se.filt.all$stage,
+                    colData(se.filt.all))
+mod0 <- model.matrix(~ 1, colData(se.filt.all))
+
+
+pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
+sum(p.adjust(pv, method="fdr") < 0.05)
+sum(p.adjust(pv, method="fdr") < 0.1)
+hist(pv, main="", las=1)
+```
+```{r}
+mask <- p.adjust(pv, method="fdr") < 0.1
+DEgenesEGs <- names(pv)[mask]
+DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
+DEgenesPvalue <- pv[mask]
+DEgenesDesc <- mcols(se.filt)[DEgenesEGs, "description"]
+DEgenesDesc <- sub(" \\[.+\\]", "", DEgenesDesc)
+DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
+                         Symbol=DEgenesSyms,
+                         Description=DEgenesDesc,
+                         "P value"=DEgenesPvalue,
+                         stringsAsFactors=FALSE, check.names=FALSE)
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+```
+
+
+```{r}
+## generate full table in a CSV file and store it in the 'doc' directory
+## twice, once in 'doc' to enable quickly look up during vignette editing
+## and building with 'devtools::build_vignettes()' and a second time in
+## 'inst/doc' to make these files available at install.
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "DEgenes_no3.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+
+## generate full table in HTML and store it into the 'doc' directory
+## twice, just as we did with the CSV file. note that because the
+## table caption is not translated from Markdown, but directly copied
+## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
+## and put its HTML code instead (&lt;)
+ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+                              fnameCSV))
+ktab <- kable_styling(ktab,
+                      bootstrap_options=c("stripped", "hover", "responsive"),
+                      fixed_thead=TRUE)
+fnameHTML <- "DEgenes_no3.html"
+fpathHTML <- proj_path(file.path("doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+fpathHTML <- proj_path(file.path("inst", "doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+
+
+ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+                              fnameHTML, fnameCSV))
+kable_styling(ktab, position="center")
+
+
+```
+
+
+
+## Between Transitional and Mature
+```{r}
+se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
+se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
+
+mod <- model.matrix(~ se.filt.all$stage,
+                    colData(se.filt.all))
+mod0 <- model.matrix(~ 1, colData(se.filt.all))
+
+
+pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
+sum(p.adjust(pv, method="fdr") < 0.05)
+sum(p.adjust(pv, method="fdr") < 0.1)
+hist(pv, main="", las=1)
+```
+```{r}
+mask <- p.adjust(pv, method="fdr") < 0.1
+DEgenesEGs <- names(pv)[mask]
+DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
+DEgenesPvalue <- pv[mask]
+DEgenesDesc <- mcols(se.filt)[DEgenesEGs, "description"]
+DEgenesDesc <- sub(" \\[.+\\]", "", DEgenesDesc)
+DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
+                         Symbol=DEgenesSyms,
+                         Description=DEgenesDesc,
+                         "P value"=DEgenesPvalue,
+                         stringsAsFactors=FALSE, check.names=FALSE)
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+```
+
+
+```{r}
+## generate full table in a CSV file and store it in the 'doc' directory
+## twice, once in 'doc' to enable quickly look up during vignette editing
+## and building with 'devtools::build_vignettes()' and a second time in
+## 'inst/doc' to make these files available at install.
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "DEgenes_no1.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+
+## generate full table in HTML and store it into the 'doc' directory
+## twice, just as we did with the CSV file. note that because the
+## table caption is not translated from Markdown, but directly copied
+## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
+## and put its HTML code instead (&lt;)
+ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+                              fnameCSV))
+ktab <- kable_styling(ktab,
+                      bootstrap_options=c("stripped", "hover", "responsive"),
+                      fixed_thead=TRUE)
+fnameHTML <- "DEgenes_no1.html"
+fpathHTML <- proj_path(file.path("doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+fpathHTML <- proj_path(file.path("inst", "doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+
+
+ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+                              fnameHTML, fnameCSV))
+kable_styling(ktab, position="center")
+
+
+```
+
+
+## Between Colostrum and Mature
+```{r}
+se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
+se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
+
+mod <- model.matrix(~ se.filt.all$stage,
+                    colData(se.filt.all))
+mod0 <- model.matrix(~ 1, colData(se.filt.all))
+
+
+pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
+sum(p.adjust(pv, method="fdr") < 0.05)
+sum(p.adjust(pv, method="fdr") < 0.1)
+hist(pv, main="", las=1)
+```
+```{r}
+mask <- p.adjust(pv, method="fdr") < 0.1
+DEgenesEGs <- names(pv)[mask]
+DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
+DEgenesPvalue <- pv[mask]
+DEgenesDesc <- mcols(se.filt)[DEgenesEGs, "description"]
+DEgenesDesc <- sub(" \\[.+\\]", "", DEgenesDesc)
+DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
+                         Symbol=DEgenesSyms,
+                         Description=DEgenesDesc,
+                         "P value"=DEgenesPvalue,
+                         stringsAsFactors=FALSE, check.names=FALSE)
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+```
+
+
+```{r}
+## generate full table in a CSV file and store it in the 'doc' directory
+## twice, once in 'doc' to enable quickly look up during vignette editing
+## and building with 'devtools::build_vignettes()' and a second time in
+## 'inst/doc' to make these files available at install.
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "DEgenes_no2.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+
+## generate full table in HTML and store it into the 'doc' directory
+## twice, just as we did with the CSV file. note that because the
+## table caption is not translated from Markdown, but directly copied
+## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
+## and put its HTML code instead (&lt;)
+ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+                              fnameCSV))
+ktab <- kable_styling(ktab,
+                      bootstrap_options=c("stripped", "hover", "responsive"),
+                      fixed_thead=TRUE)
+fnameHTML <- "DEgenes_no2.html"
+fpathHTML <- proj_path(file.path("doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+fpathHTML <- proj_path(file.path("inst", "doc", fnameHTML))
+save_kable(ktab, file=fpathHTML, self_contained=TRUE)
+
+
+ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+                              fnameHTML, fnameCSV))
+kable_styling(ktab, position="center")
+
+
+```
+
+
+In the progression from colostral to
+transitional stages, 8015 genes
+
+7173
+
+and in the
+progression from transitional to mature stages, 1948 
+
+1463
+
+Comparing colostral directly to mature, there are 8817 
+
+8527
+
+<!---
 We perform a simple assessment of the extent of expression changes and
 their associated p-values using the F-test implemented in the
 R/Bioconductor package [sva](http://bioconductor.org/packages/sva). We will
@@ -608,13 +840,7 @@ rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
 ```{=html}
-<!--
-The following code chunk is hidden because its lines are not that relevant
-to the analysis of the data. Their purpose is to dump the table of DE genes
-into an HTML table and a CSV file to facilitate the examination of long lists
-of DE genes while avoiding to produce a lengthy vignette by showing only the
-top-10 DE genes.
---->
+
 ```
 ```{r, echo=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
@@ -648,17 +874,6 @@ save_kable(ktab, file=fpathHTML, self_contained=TRUE)
 ```
 
 ```{=html}
-<!--
-The following code chunk is also hidden because its purpose is to produce
-a short HTML table of the top-10 DE genes. The reason show here only the
-top-10 genes is to producing a long vignette. The full HTML table and the
-corresponding CSV file are linked through the caption of this short HTML
-table.
-
-note that because the table caption is not translated from Markdown, but
-directly copied into HTML, we need to avoid using the '<' symbol, as in
-FDR < 10%, and put its HTML code instead (&lt;)
---->
 ```
 ```{r DEgenesSARScov2NHBE, echo=FALSE}
 ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
@@ -666,6 +881,8 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 ```
+
+--->
 
 # Functional analysis
 
