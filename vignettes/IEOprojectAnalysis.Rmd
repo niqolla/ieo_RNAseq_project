@@ -50,6 +50,8 @@ options(usethis.quiet=TRUE)
 
 # Introduction
 
+Lactation is highly recommended for infants for at least their first year of life, however the breastfeeding success of the mothers is not always achieved. Since the study of this fact is hard to be carried out because of ethical reasons about extracting mammary cells from women in the lactation period, the authors propose the RNA-seq analysis of the surplus feeding milk. They expect to get a deeper understanding of the underlying biological causes of the high variation in mother’s breastfeeding success, specifically they decide to evaluate whether genes related with insulin signaling are linked to breastfeeding ability. 
+
 # Quality assessment
 
 ## Data import and cleaning
