@@ -115,12 +115,11 @@ cex.axis=1.2, cex.lab=1.5, las=2)
 
 
 ## -----------------------------------------------------------------------------
-# colData(se)$lacStageFac <- factor(colData(se)$lacStage)
+# Create factors for lacStage and protocol
 se$lacStageFac <- factor(colData(se)$lacStage,
                                   levels = c("Colostrum", "Transitional", "Mature"),
                                   labels = c(1, 2, 3))
 
-#colData(se)$protocolFac <- factor(colData(se)$protocol)
 se$protocolFac <- factor(colData(se)$protocol,
                                   levels = c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"),
                                   labels = c(1, 2, 3, 4 ))
@@ -292,7 +291,7 @@ legend("bottomright", levels(se.filt$protocolFac),
 ## -----------------------------------------------------------------------------
 library(sva)
 
-## -----------------------------------------------------------------------------
+## ----CThist, echo=FALSE-------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -302,11 +301,11 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## -----------------------------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -321,7 +320,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## -----------------------------------------------------------------------------
+## ----CTtab, echo=FALSE--------------------------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -357,7 +356,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## -----------------------------------------------------------------------------
+## ----TMhist, echo=FALSE-------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -367,11 +366,11 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## -----------------------------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -386,7 +385,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## -----------------------------------------------------------------------------
+## ----TMtab, echo=FALSE--------------------------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -422,7 +421,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## -----------------------------------------------------------------------------
+## ----CMhist, echo=FALSE-------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -432,8 +431,8 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
+#sum(p.adjust(pv, method="fdr") < 0.05)
+#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
 ## -----------------------------------------------------------------------------
@@ -451,7 +450,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## -----------------------------------------------------------------------------
+## ----CMtab--------------------------------------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
