@@ -623,7 +623,7 @@ top-10 DE genes.
 ## 'inst/doc' to make these files available at install.
 use_directory(file.path("doc"))
 use_directory(file.path("inst", "doc"))
-fnameCSV <- "DEgenesSARScov2NHBE.csv"
+fnameCSV <- "DEgenes.csv"
 fpathCSV <- proj_path(file.path("doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
@@ -640,7 +640,7 @@ ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
 ktab <- kable_styling(ktab,
                       bootstrap_options=c("stripped", "hover", "responsive"),
                       fixed_thead=TRUE)
-fnameHTML <- "DEgenesSARScov2NHBE.html"
+fnameHTML <- "DEgenes.html"
 fpathHTML <- proj_path(file.path("doc", fnameHTML))
 save_kable(ktab, file=fpathHTML, self_contained=TRUE)
 fpathHTML <- proj_path(file.path("inst", "doc", fnameHTML))
