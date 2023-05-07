@@ -71,6 +71,8 @@ se
 
 ```
 
+This is a test comment!!
+
 We have `r nrow(se)` genes by `r ncol(se)` samples. From the first row
 and column names shown by the object, we can figure out that genes are
 defined by [Entrez](https://www.ncbi.nlm.nih.gov/gene) [@maglott10]
