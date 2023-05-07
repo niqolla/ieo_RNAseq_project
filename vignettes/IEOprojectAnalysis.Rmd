@@ -81,6 +81,8 @@ identifiers and samples by Sequence Read Archive Run
 ([SRR](https://www.ncbi.nlm.nih.gov/books/NBK56913/#search.what_do_the_different_sra_accessi))
 identifiers.
 
+Regarding the samples, we can see that tey are few, so the analysis results quality will be likely affected by this fact. It is important to keep it in mind along the process.
+
 The row data in this object contains information about the profiled
 genes.
 
@@ -262,12 +264,11 @@ cex.axis=1.2, cex.lab=1.5, las=2)
 In the previous plots we see that the SRR801705 sample does not behave differently than the rest, but this is due to the fact that we are now considering the counts per million (CPM), and what is wrong about that sample is the sequencing depth, so still we will exclude it from the analysis.
 
 ```{r}
-# colData(se)$lacStageFac <- factor(colData(se)$lacStage)
+# Create factors for lacStage and protocol
 se$lacStageFac <- factor(colData(se)$lacStage,
                                   levels = c("Colostrum", "Transitional", "Mature"),
                                   labels = c(1, 2, 3))
 
-#colData(se)$protocolFac <- factor(colData(se)$protocol)
 se$protocolFac <- factor(colData(se)$protocol,
                                   levels = c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"),
                                   labels = c(1, 2, 3, 4 ))
@@ -434,9 +435,7 @@ for (i in 1:ncol(se.filt)) {
 A number of samples display some expression-level dependent bias. For
 cases in which this occurs at the low-end of the expression level, one
 solution could be to have a more stringent filter on minimum expression
-(using a grouping with more samples per group, for instance). We should
-keep an eye on samples with these biases in case they also display other
-unexpected features, because then we might consider removing them.
+using a grouping with more samples per group, for instance. However, considering the low number of samples we are working with we decide to keep it this way. Of course, we should keep an eye on samples with these biases in case they also display other unexpected features, because then we might consider removing them.
 
 ## Experimental design and batch identification
 
@@ -540,15 +539,20 @@ legend("bottomright", levels(se.filt$protocolFac),
 
 In fact, the samples group by lactation stage.
 
-###### ========
+
 # Differential expression
+
+We will study the differential expression between the lactation stages comparing them in groups of 2. So we will first compare Colostrum and Transitional stages, then Transitional and Mature and finally Colostrum and Mature.
 
 ```{r}
 library(sva)
 ```
 
 ## Between Colostrum and Transitional
-```{r}
+
+Checking the distribution of differentially expressed genes:
+
+```{r CThist, echo=FALSE}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -562,7 +566,7 @@ sum(p.adjust(pv, method="fdr") < 0.05)
 sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
-```{r}
+```{r, echo=FALSE}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -578,8 +582,9 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
+In the following table the DE genes with lowest p-values are displayed:
 
-```{r}
+```{r, echo=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -619,7 +624,10 @@ kable_styling(ktab, position="center")
 
 
 ## Between Transitional and Mature
-```{r}
+
+Checking the distribution of differentially expressed genes:
+
+```{r TMhist, echo=FALSE}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -633,7 +641,7 @@ sum(p.adjust(pv, method="fdr") < 0.05)
 sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
-```{r}
+```{r, echo=FALSE}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -649,8 +657,9 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
+In the following table the DE genes with lowest p-values are displayed:
 
-```{r}
+```{r, echo=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -689,7 +698,10 @@ kable_styling(ktab, position="center")
 
 
 ## Between Colostrum and Mature
-```{r}
+
+Checking the distribution of differentially expressed genes:
+
+```{r CMhist, echo=FALSE}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -719,6 +731,7 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
+In the following table the DE genes with lowest p-values are displayed:
 
 ```{r}
 ## generate full table in a CSV file and store it in the 'doc' directory
@@ -757,6 +770,14 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
+
+Differentially expressed genes in the three comparisons above we observe:
+
+- Colostral-Transitional 7173 DE genes
+- Transitional-Mature 1463 DE genes
+- Colostral-Mature 8527 DE genes.
+
+These values we obtained are quite consistent with the reported DE genes from the atricle. Even the number are quite large, we think it makes sense because of the nature of the tissue. The milk should adap to the infant's needs.
 
 In the progression from colostral to
 transitional stages, 8015 genes
