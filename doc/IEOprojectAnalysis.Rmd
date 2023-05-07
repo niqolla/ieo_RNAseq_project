@@ -215,10 +215,8 @@ kable_styling(ktab, position="center")
 
 ## Sequencing depth
 
-Let's examine the sequencing depth in terms of total number of sequence
-read counts mapped to the genome per sample. Figure \@ref(fig:libsizes)
-below shows the sequencing depth per sample, also known as library
-sizes, in increasing order.
+Let's examine the sequencing depth in terms of total number of sequence read counts mapped to the genome per sample. The figure below shows the sequencing depth per sample, also known as library sizes, in increasing order.
+
 ```{r libsizes, echo=FALSE}
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
@@ -242,7 +240,7 @@ legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Wa
        fill=c("blue", "green", "red", "orange"), inset=0.01, cex=0.85)
 ```
 
-From the plot above ( \@ref(fig:libsizes_2) ) we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
+From the plot above we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
 
 ## Distribution of expression levels among samples
 
@@ -278,7 +276,7 @@ cex.axis=1.2, cex.lab=1.5, las=2)
 
 In the previous plots we see that the SRR801705 sample does not behave differently than the rest, but this is due to the fact that we are now considering the counts per million (CPM), and what is wrong about that sample is the sequencing depth, so still we will exclude it from the analysis.
 
-```{r}
+```{r, echo=FALSE}
 # Create factors for lacStage and protocol
 se$lacStageFac <- factor(colData(se)$lacStage,
                                   levels = c("Colostrum", "Transitional", "Mature"),
@@ -331,6 +329,10 @@ of expression across a number of samples.
 
 ## Filtering of lowly-expressed genes
 
+In the paper, transcript abundances were estimated as FPKMs (fragments per kilobase of exon per million fragments mapped) using Cufflinks. Genes with a mean expression level less than 0.01 FPKM (manually set) across all time points and all samples were excluded from further analysis.
+
+In our analysis, we use CPM (counts per million) and after some trial and error we found that the best cutoff value from the cpm would be arround 0.1.
+
 ```{r}
 
 #cpmcutoff <- round(10/min(dge_sample_filtered$sample$lib.size/1e6), digits=1)
@@ -361,14 +363,10 @@ lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
 
 legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
-
-
 ```
 
+We are left with `r nrow(se_sample_filtered)` genes.
 
-We filter lowly-expressed genes using the function `filterByExpr()`,
-grouping by sample-group to define the minimum number of samples in
-which a gene should be expressed. We are left with `r nrow(se_sample_filtered)` genes.
 <!---
 We are left with `r nrow(se_sample_filtered)` genes.
 
@@ -454,15 +452,7 @@ using a grouping with more samples per group, for instance. However, considering
 
 ## Experimental design and batch identification
 
-Here try to understand the underlying experimental design. Let's start
-examining the distribution of samples across the combinations of lactation stage and protocol.
-
-We can see that not all combinations have
-been sequenced. For this reason, we can anticipate that it won't be
-possible to identify expression changes associated with all levels of
-these two factors. We will have to make comparisons within each lactation stage, between those protocols that have been sequenced.
-
-Now, let's look at the combination of sample preparation protocol and
+Here try to understand the underlying experimental design. We take a look at the combination of sample preparation protocol and
 lactation stage.
 
 ```{r}
@@ -506,10 +496,10 @@ legend("right", levels(se.filt$protocolFac),
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 ```
 
-We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in Figure \@ref(fig:sampleClustering_1).
+We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in the figure below.
 
 
-```{r sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+```{r sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -557,9 +547,11 @@ In fact, the samples group by lactation stage.
 
 # Differential expression
 
-We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. Firstly, we observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we excluded colostrum stage (stage 1) and finally we excluded transitional stage (stage 2).
+We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
 
-```{r}
+First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclud colostrum stage (stage 1) and finally we will exclud transitional stage (stage 2).
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(sva)
 ```
 
@@ -581,6 +573,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
+
 ```{r, echo=FALSE}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
@@ -599,7 +592,7 @@ rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
 In the table \@ref(tab:CTtab) the DE genes with lowest p-values are displayed:
 
-```{r CTtab, echo=FALSE}
+```{r CTtab, echo=FALSE, warning=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -674,7 +667,7 @@ rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
 In the table \@ref(tab:TMtab) the DE genes with lowest p-values are displayed:
 
-```{r TMtab, echo=FALSE}
+```{r TMtab, echo=FALSE, warning=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -730,7 +723,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -748,7 +741,7 @@ rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
 In the table \@ref(tab:CMtab) the DE genes with lowest p-values are displayed:
 
-```{r CMtab}
+```{r CMtab, echo=FALSE, warning=FALSE}
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in

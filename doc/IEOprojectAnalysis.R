@@ -114,7 +114,7 @@ boxplot(assays(se)$logCPM, col="gray", ylab=expression(log[2] * "CPM"),
 cex.axis=1.2, cex.lab=1.5, las=2)
 
 
-## -----------------------------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 # Create factors for lacStage and protocol
 se$lacStageFac <- factor(colData(se)$lacStage,
                                   levels = c("Colostrum", "Transitional", "Mature"),
@@ -180,8 +180,6 @@ x <- cut(rowMeans(assays(se.filt)$logCPM), breaks=h$breaks)
 lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
 
 legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
-
-
 
 
 ## -----------------------------------------------------------------------------
@@ -253,7 +251,7 @@ legend("right", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
-## ----sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+## ----sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -288,7 +286,7 @@ legend("bottomright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
-## -----------------------------------------------------------------------------
+## ----echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE--------------
 library(sva)
 
 ## ----CThist, echo=FALSE-------------------------------------------------------
@@ -320,7 +318,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## ----CTtab, echo=FALSE--------------------------------------------------------
+## ----CTtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -385,7 +383,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## ----TMtab, echo=FALSE--------------------------------------------------------
+## ----TMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -435,7 +433,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## -----------------------------------------------------------------------------
+## ---- echo=FALSE, warning=FALSE-----------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -450,7 +448,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## ----CMtab--------------------------------------------------------------------
+## ----CMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
