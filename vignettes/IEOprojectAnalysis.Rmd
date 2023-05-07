@@ -487,8 +487,9 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
 plot(sampleDendrogram, main="Hierarchical clustering of samples",
      cex=2.0, cex.axis=1.9, cex.main=1.9)
 
-legend("topright", levels(se.filt$protocolFac),
-       fill=seq_len(nlevels(se.filt$protocolFac)),cex=1.5)
+legend("right", levels(se.filt$protocolFac),
+       fill=seq_len(nlevels(se.filt$protocolFac)), 
+       legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 ```
 
 We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in Figure \@ref(fig:sampleClustering_1).
@@ -514,11 +515,11 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of samples",
-     cex=1.8, cex.axis=1.9, cex.main=1.9)
+plot(sampleDendrogram, main="Hierarchical clustering of samples")
 
 legend("topright", levels(se.filt$lacStageFac),
-       fill=seq_len(nlevels(se.filt$lacStageFac)),cex=1.5)
+       fill=seq_len(nlevels(se.filt$lacStageFac)),
+       legend = c("Colostrum", "Transitional", "Mature"))
 ```
 
 
@@ -531,15 +532,20 @@ Next we will perform an MDS plot using the names of the lactation stages and col
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
-plotMDS(dge.filt, labels=outcome, col=batch, cex=1.5)
-legend("topright", levels(se.filt$protocolFac),
-       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, cex=1.5)
+plotMDS(dge.filt, labels=outcome, col=batch)
+legend("bottomright", levels(se.filt$protocolFac),
+       fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, 
+       legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 ```
 
 In fact, the samples group by lactation stage.
 
 ###### ========
 # Differential expression
+
+```{r}
+library(sva)
+```
 
 ## Between Colostrum and Transitional
 ```{r}
@@ -608,8 +614,6 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-
-
 ```
 
 
@@ -681,8 +685,6 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-
-
 ```
 
 
@@ -753,8 +755,6 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-
-
 ```
 
 
@@ -772,117 +772,6 @@ Comparing colostral directly to mature, there are 8817
 
 8527
 
-<!---
-We perform a simple assessment of the extent of expression changes and
-their associated p-values using the F-test implemented in the
-R/Bioconductor package [sva](http://bioconductor.org/packages/sva). We will
-compare the expressiona among the lactation stages. We
-first subset the data as follows:
-
-```{r}
-se.filt.all <- se.filt
-se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
-```
-
-In the second step above, we dropped the unused levels from the
-treatment factor variable. This is important to avoid using factor
-levels that do not exist in this subset of the data. We build now the
-corresponding full and null model matrices.
-
-```{r}
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
-mod0 <- model.matrix(~ 1, colData(se.filt.all))
-```
-
-Finally, we conduct the F-test implemented in the package `sva` and
-examine the amount of differential expression between the 3 lactation stages.
-
-```{r, message=FALSE}
-library(sva)
-
-pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-sum(p.adjust(pv, method="fdr") < 0.05)
-sum(p.adjust(pv, method="fdr") < 0.1)
-```
-
-We obtain `r sum(p.adjust(pv, method="fdr") < 0.05)` differentially
-expressed (DE) genes at FDR \< 5% and
-`r sum(p.adjust(pv, method="fdr") < 0.1)` at FDR \< 10%. In Figure
-\@ref(fig:pdistCOV2NHBE) below we can see the distribution of the
-resulting p-values.
-
-```{r pdistCOV2NHBE, echo=FALSE, out.width="600px", fig.cap="Distribution of raw p-values for an F-test on every gene in the dataset between the 3 lactation stages."}
-hist(pv, main="", las=1)
-```
-
-The amount of differentially expressed genes is very high, in fact most of the studied genes are. This result might be due to the nature of the analyzed sample, since lactation milk can evolve during the lactation period in order to adapt to the baby's needs. Considering all this the result can be coherent.
-
-We build a table with the subset of
-`r sum(p.adjust(pv, method="fdr") < 0.1)` DE genes with FDR \< 10% and
-show the top-10 genes with lowest p-value in Table
-\@ref(tab:DEgenesSARScov2NHBE) below.
-
-```{r, message=FALSE}
-mask <- p.adjust(pv, method="fdr") < 0.1
-DEgenesEGs <- names(pv)[mask]
-DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
-DEgenesPvalue <- pv[mask]
-DEgenesDesc <- mcols(se.filt)[DEgenesEGs, "description"]
-DEgenesDesc <- sub(" \\[.+\\]", "", DEgenesDesc)
-DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
-                         Symbol=DEgenesSyms,
-                         Description=DEgenesDesc,
-                         "P value"=DEgenesPvalue,
-                         stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
-rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
-```
-
-```{=html}
-
-```
-```{r, echo=FALSE}
-## generate full table in a CSV file and store it in the 'doc' directory
-## twice, once in 'doc' to enable quickly look up during vignette editing
-## and building with 'devtools::build_vignettes()' and a second time in
-## 'inst/doc' to make these files available at install.
-use_directory(file.path("doc"))
-use_directory(file.path("inst", "doc"))
-fnameCSV <- "DEgenes.csv"
-fpathCSV <- proj_path(file.path("doc", fnameCSV))
-write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
-fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
-write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
-
-## generate full table in HTML and store it into the 'doc' directory
-## twice, just as we did with the CSV file. note that because the
-## table caption is not translated from Markdown, but directly copied
-## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
-## and put its HTML code instead (&lt;)
-ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
-              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
-                              fnameCSV))
-ktab <- kable_styling(ktab,
-                      bootstrap_options=c("stripped", "hover", "responsive"),
-                      fixed_thead=TRUE)
-fnameHTML <- "DEgenes.html"
-fpathHTML <- proj_path(file.path("doc", fnameHTML))
-save_kable(ktab, file=fpathHTML, self_contained=TRUE)
-fpathHTML <- proj_path(file.path("inst", "doc", fnameHTML))
-save_kable(ktab, file=fpathHTML, self_contained=TRUE)
-```
-
-```{=html}
-```
-```{r DEgenesSARScov2NHBE, echo=FALSE}
-ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
-                              fnameHTML, fnameCSV))
-kable_styling(ktab, position="center")
-```
-
---->
 
 # Functional analysis
 
