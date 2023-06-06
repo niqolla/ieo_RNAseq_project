@@ -863,7 +863,6 @@ KEGGresults
 getKEGGName <- function(input) {
   # Construct the KEGG ID
   kegg_id <- paste0("hsa", input)
-  print(kegg_id)
   
   tryCatch(
     {
@@ -871,20 +870,15 @@ getKEGGName <- function(input) {
       rezKEGG <- keggGet(kegg_id)
       name <- rezKEGG[[1]]$NAME
       name <- gsub(" - Homo sapiens \\(human\\)", "", name)
-      print(name)
       return(name)
   
     },
     error = function(err) {
       # Code to execute if an error occurs
       name <- "no info"
-      print(name)
       return(name)
     }
   )
-  
-  # Extract the name from the retrieved information
-
 }
 ```
 
@@ -893,22 +887,21 @@ getKEGGClass <- function(input) {
   
   # Construct the KEGG ID
   kegg_id <- paste0("hsa", input)
-  print(kegg_id)
   
   tryCatch(
     {
       # Retrieve KEGG information
       rezKEGG <- keggGet(kegg_id)
       class_name <- rezKEGG[[1]]$CLASS
-      class_name <- gsub(" - Homo sapiens \\(human\\)", "", name)
-      print(class_name)
+      if (is.null(class_name)) {
+        class_name <- "no info"
+      }
       return(class_name)
   
     },
     error = function(err) {
       # Code to execute if an error occurs
       class_name <- "no info"
-      print(class_name)
       return(class_name)
     }
   )
@@ -919,16 +912,16 @@ getKEGGClass <- function(input) {
 names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
 KEGGresults$Term <- as.data.frame(names_names)$names_names
 
+class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
+KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
+
 ```
 
 ```{r}
 KEGGresults
 ```
 
-```{r}
-class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
-KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
-```
+
 
 ## Between Transitional and Mature (no_1)
 
