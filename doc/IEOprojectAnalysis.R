@@ -331,6 +331,8 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
+DEgenesEGs_no3 <- DEgenesEGs
+
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
 ## table caption is not translated from Markdown, but directly copied
@@ -395,6 +397,8 @@ fpathCSV <- proj_path(file.path("doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
+
+DEgenesEGs_no1 <- DEgenesEGs
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -461,6 +465,8 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
+DEgenesEGs_no2 <- DEgenesEGs
+
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
 ## table caption is not translated from Markdown, but directly copied
@@ -484,14 +490,138 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## -----------------------------------------------------------------------------
-
+## ----warning=FALSE------------------------------------------------------------
 library(org.Hs.eg.db)
+library(GOstats)
+library(KEGGREST)
+
+geneUniverse <- rownames(se)
 
 ## -----------------------------------------------------------------------------
-org.Hs.eg.db
+
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+
+conditional(params) <- TRUE
+hgOverCond <- hyperGTest(params)
+goresults <- summary(hgOverCond)
+
+## -----------------------------------------------------------------------------
+mask <- goresults$OddsRatio != "Inf"
+goresults <- goresults[mask, ]
+goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
+goresults
+
+## ----message=FALSE, warning=FALSE---------------------------------------------
+geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
+geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
+goresults <- cbind(goresults, Genes=geneSYMs)
+rownames(goresults) <- 1:nrow(goresults)
 
 
+ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
+
+
+## -----------------------------------------------------------------------------
+
+KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
+KEGGhgOver <- hyperGTest(KEGGparams)
+KEGGresults <- summary(KEGGhgOver)
+
+
+## -----------------------------------------------------------------------------
+KEGGresults
+
+## -----------------------------------------------------------------------------
+getKEGGName <- function(input) {
+  # Construct the KEGG ID
+  kegg_id <- paste0("hsa", input)
+  
+  tryCatch(
+    {
+      # Retrieve KEGG information
+      rezKEGG <- keggGet(kegg_id)
+      name <- rezKEGG[[1]]$NAME
+      name <- gsub(" - Homo sapiens \\(human\\)", "", name)
+      return(name)
+  
+    },
+    error = function(err) {
+      # Code to execute if an error occurs
+      name <- "no info"
+      return(name)
+    }
+  )
+}
+
+## -----------------------------------------------------------------------------
+getKEGGClass <- function(input) {
+  
+  # Construct the KEGG ID
+  kegg_id <- paste0("hsa", input)
+  
+  tryCatch(
+    {
+      # Retrieve KEGG information
+      rezKEGG <- keggGet(kegg_id)
+      class_name <- rezKEGG[[1]]$CLASS
+      if (is.null(class_name)) {
+        class_name <- "no info"
+      }
+      return(class_name)
+  
+    },
+    error = function(err) {
+      # Code to execute if an error occurs
+      class_name <- "no info"
+      return(class_name)
+    }
+  )
+}
+
+## -----------------------------------------------------------------------------
+source("../R/custom_functions.R")
+
+names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
+KEGGresults$Term <- as.data.frame(names_names)$names_names
+
+class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
+KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
+
+
+## -----------------------------------------------------------------------------
+KEGGresults
+
+## -----------------------------------------------------------------------------
+
+KEGGresults$KEGGClassNames
+
+class_names_string <- paste(KEGGresults$KEGGClassNames, collapse = "; ")
+
+class_names_list <- strsplit(class_names_string, "; ")[[1]]
+
+freq_table <- table(class_names_list)
+
+ordered_freq_table <- freq_table[order(-freq_table)]
+
+# Create a bar plot with ordered frequencies and rotated leaf labels
+# Create a larger plotting area
+par(mar = c(6, 6, 4, 2) + 3)
+
+barplot(ordered_freq_table, horiz = FALSE, las = 2, cex.names = 0.8)
+
+
+## -----------------------------------------------------------------------------
+
+
+
+## -----------------------------------------------------------------------------
+
+## -----------------------------------------------------------------------------
+
+## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
 sessionInfo()
