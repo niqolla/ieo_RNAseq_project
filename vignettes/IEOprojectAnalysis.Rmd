@@ -116,10 +116,9 @@ head(colData(se), n=3)
 
 We have a total of `r ncol(colData(se))` phenotypic variables. The
 second column `geo_accession` contains GEO Sample Accession Number
-([GSM](https://www.ncbi.nlm.nih.gov/geo/info/overview.html)) identifers.
+([GSM](https://www.ncbi.nlm.nih.gov/geo/info/overview.html)) identifiers.
 GSM identifiers define individual samples, understood in our context as
-individual sources of RNA. We can see these are repeated, indicating
-that among the `ncol(se)` samples we have technical replicates.
+individual sources of RNA. In this dataset, there are no technical replicates.
 
 To proceed further exploring this dataset, we are going to use the
 [edgeR](https://bioconductor.org/packages/edgeR) package and build a
@@ -365,7 +364,7 @@ legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
 ```
 
-We are left with `r nrow(se_sample_filtered)` genes.
+We are left with `r nrow(se.filt)` genes.
 
 <!---
 We are left with `r nrow(se_sample_filtered)` genes.
@@ -551,7 +550,7 @@ We now perform an analysis to observe differential expressed (DE) genes by exclu
 
 First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclud colostrum stage (stage 1) and finally we will exclud transitional stage (stage 2).
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(sva)
 ```
 
@@ -559,7 +558,7 @@ library(sva)
 
 Checking the distribution of differentially expressed genes:
 
-```{r CThist, echo=FALSE}
+```{r CThist}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -574,7 +573,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 hist(pv, main="", las=1)
 ```
 
-```{r, echo=FALSE}
+```{r}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -635,7 +634,7 @@ kable_styling(ktab, position="center")
 
 Checking the distribution of differentially expressed genes:
 
-```{r TMhist, echo=FALSE}
+```{r TMhist}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -649,7 +648,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
-```{r, echo=FALSE}
+```{r}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -709,7 +708,7 @@ kable_styling(ktab, position="center")
 
 Checking the distribution of differentially expressed genes:
 
-```{r CMhist, echo=FALSE}
+```{r CMhist}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -723,7 +722,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
-```{r, echo=FALSE, warning=FALSE}
+```{r warning=FALSE}
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]

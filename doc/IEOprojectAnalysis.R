@@ -286,10 +286,10 @@ legend("bottomright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
-## ----echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE--------------
+## ----message=FALSE, warning=FALSE, paged.print=FALSE--------------------------
 library(sva)
 
-## ----CThist, echo=FALSE-------------------------------------------------------
+## ----CThist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -303,7 +303,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## -----------------------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -354,7 +354,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## ----TMhist, echo=FALSE-------------------------------------------------------
+## ----TMhist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -368,7 +368,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## -----------------------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -419,7 +419,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## ----CMhist, echo=FALSE-------------------------------------------------------
+## ----CMhist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -433,7 +433,7 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
-## ---- echo=FALSE, warning=FALSE-----------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
