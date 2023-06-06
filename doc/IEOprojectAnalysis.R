@@ -316,7 +316,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
-rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+# rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
 ## ----CTtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
@@ -483,6 +483,15 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
+
+## -----------------------------------------------------------------------------
+
+library(org.Hs.eg.db)
+
+## -----------------------------------------------------------------------------
+org.Hs.eg.db
+
+
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

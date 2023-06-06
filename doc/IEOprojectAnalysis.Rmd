@@ -586,7 +586,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
-rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+# rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
 In the table \@ref(tab:CTtab) the DE genes with lowest p-values are displayed:
@@ -794,6 +794,16 @@ As we mentioned, the sample size is quite small in our case, so that gives rise 
 # Functional analysis
 
 Here we will do the functional analysis.
+
+```{r}
+
+library(org.Hs.eg.db)
+```
+```{r}
+org.Hs.eg.db
+
+
+```
 
 # Discussion
 
