@@ -947,7 +947,6 @@ goresults
 ### KEGG enrichment
 
 ```{r}
-
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
