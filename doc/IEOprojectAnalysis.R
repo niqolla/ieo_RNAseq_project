@@ -203,7 +203,7 @@ for (i in 1:ncol(se.filt)) {
 ## -----------------------------------------------------------------------------
 table(se.filt$lacStageFac, se.filt$protocolFac)
 
-## ----sampleClustering, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+## ----sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -230,7 +230,7 @@ legend("right", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
-## ----sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+## ----sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -279,8 +279,9 @@ plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
 ## -----------------------------------------------------------------------------
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 
-## ----message=FALSE, warning=FALSE, paged.print=FALSE--------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(sva)
+library(limma)
 
 ## ----CThist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]

@@ -432,9 +432,9 @@ We examine now how samples group together by hierarchical clustering and
 multidimensional scaling, annotating lactation stage (number) and protocol(color) for each sample. We
 calculate again log CPM values with a high prior count(3) to moderate
 extreme fold-changes produced by low counts. The resulting dendrogram is
-shown in Figure \@ref(fig:sampleClustering).
+shown in Figure \@ref(fig:sampleClusteringTechnique).
 
-```{r sampleClustering, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S6: Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+```{r sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -462,10 +462,10 @@ legend("right", levels(se.filt$protocolFac),
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 ```
 
-We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in the figure below.
+We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in the Figure \@ref(fig:sampleClusteringLacStage).
 
 
-```{r sampleClustering_1, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+```{r sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -539,8 +539,9 @@ We now perform an analysis to observe differential expressed (DE) genes by exclu
 
 First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclud colostrum stage (stage 1) and finally we will exclud transitional stage (stage 2).
 
-```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(sva)
+library(limma)
 ```
 
 ## Between Colostrum and Transitional
