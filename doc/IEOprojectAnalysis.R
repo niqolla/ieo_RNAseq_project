@@ -554,7 +554,7 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
-goresults
+
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
@@ -570,7 +570,7 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
 
 ## -----------------------------------------------------------------------------
-goresults
+
 
 ## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
@@ -582,7 +582,6 @@ KEGGresults <- summary(KEGGhgOver)
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
-KEGGresults
 
 
 ## -----------------------------------------------------------------------------
@@ -597,15 +596,12 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 ## -----------------------------------------------------------------------------
 KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
-KEGGresults
 
 ## ----message=FALSE------------------------------------------------------------
 KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
-
-KEGGresults_with_genes
 
 ## -----------------------------------------------------------------------------
 

@@ -881,7 +881,7 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
-goresults
+
 ```
 
 redgo <- goresults[goresults$Size >= 3 & goresults$Size <= 300 & goresults$Count >= 29, ]
@@ -907,9 +907,9 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 ```
 
 ```{r}
-goresults
+
 ```
-<!---
+
 ### KEGG enrichment
 
 ```{r}
@@ -923,7 +923,6 @@ KEGGresults <- summary(KEGGhgOver)
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
-KEGGresults
 
 ```
 
@@ -941,7 +940,6 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 ```{r}
 KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
-KEGGresults
 ```
 
 ```{r message=FALSE}
@@ -949,10 +947,7 @@ KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
-
-KEGGresults_with_genes
 ```
---->
 
 ```{r}
 

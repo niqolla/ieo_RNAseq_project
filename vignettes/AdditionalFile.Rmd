@@ -1,0 +1,26 @@
+---
+title: "Additional File"
+author:
+- name: "Nikola Panajotovikj, Ester Muñoz del Campo, Marko Ludaic"
+  affiliation: Universitat Pompeu Fabra
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    fig_captions: yes
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{AdditionalFile}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+
+print("hi")
+```
