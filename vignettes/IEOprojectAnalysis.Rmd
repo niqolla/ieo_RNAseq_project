@@ -979,7 +979,7 @@ KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
 KEGGresults
 ```
 
-```{r}
+```{r message=FALSE}
 KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
