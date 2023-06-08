@@ -796,6 +796,11 @@ It is evident that the number of differentially expressed genes that was obtaine
 As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
 
+# volcanoooosss
+
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+
+
 # adsasdassadffsa
 
 ```{r}
