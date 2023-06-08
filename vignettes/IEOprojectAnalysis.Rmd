@@ -574,6 +574,7 @@ First, we will observed stage 1 and 2 that correspond to colostrum and transitio
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(sva)
+library(limma)
 ```
 
 ## Between Colostrum and Transitional
@@ -660,6 +661,9 @@ mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
+tt3 <- topTable(fit3, coef=2, n=Inf)
+DEgenes3 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
+sort(table(tt3[DEgenes3, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
@@ -833,17 +837,6 @@ kable_styling(ktab, position="center")
 ```
 
 
-The number of DE genes in the three comparisons above are:
-
-- Colostral-Transitional `r length(DEgenesEGs_no3)` DE genes
-- Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
-- Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
-
-
-It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
-
-As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
-
 ### for volcano
 ```{r}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
@@ -856,6 +849,19 @@ genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 ```
+
+
+
+The number of DE genes in the three comparisons above are:
+
+- Colostral-Transitional `r length(DEgenesEGs_no3)` DE genes
+- Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
+- Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
+
+
+It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
+
+As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
 # Functional analysis
 
