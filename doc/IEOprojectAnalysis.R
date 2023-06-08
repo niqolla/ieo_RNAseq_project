@@ -183,27 +183,6 @@ legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
 
 ## -----------------------------------------------------------------------------
-
-mask <- filterByExpr(dge_sample_filtered, group=colData(se_sample_filtered)$protocolFac)
-se.filt <- se_sample_filtered[mask, ]
-dim(se.filt)
-dge.filt <- dge_sample_filtered[mask, ]
-dim(dge.filt)
-
-## -----------------------------------------------------------------------------
-par(mar=c(4, 5, 1, 1))
-
-h <- hist(avgexp, xlab=expression("Expression level (" * log[2] * "CPM)"), 
-          main="", las=1, col="grey", cex.axis=1.2, cex.lab=1.5)
-
-x <- cut(rowMeans(assays(se.filt)$logCPM), breaks=h$breaks)
-
-lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
-
-legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
-
-
-## -----------------------------------------------------------------------------
 dge.filt <- calcNormFactors(dge.filt)
 
 ## -----------------------------------------------------------------------------
@@ -286,6 +265,20 @@ legend("bottomright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
+## -----------------------------------------------------------------------------
+Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
+Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
+Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
+
+## -----------------------------------------------------------------------------
+plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
+
+## -----------------------------------------------------------------------------
+plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
+
+## -----------------------------------------------------------------------------
+plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
+
 ## ----message=FALSE, warning=FALSE, paged.print=FALSE--------------------------
 library(sva)
 
@@ -297,10 +290,7 @@ mod <- model.matrix(~ se.filt.all$stage,
                     colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
-
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-#sum(p.adjust(pv, method="fdr") < 0.05)
-#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
 ## -----------------------------------------------------------------------------
@@ -317,6 +307,25 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 # rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+
+## -----------------------------------------------------------------------------
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+tt3 <- topTable(fit3, coef=2, n=Inf)
+DEgenes_no3 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
+sort(table(tt3[DEgenes_no3, "chr"]), decreasing=TRUE)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+
+## -----------------------------------------------------------------------------
+mask <- DEgenesTab$EntrezID %in% DEgenes_no3
+DEgenesTab <- DEgenesTab[mask,]
 
 ## ----CTtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
@@ -385,6 +394,24 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
+## -----------------------------------------------------------------------------
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+tt3 <- topTable(fit3, coef=2, n=Inf)
+DEgenes_no1 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
+sort(table(tt3[DEgenes_no1, "chr"]), decreasing=TRUE)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+## -----------------------------------------------------------------------------
+mask <- DEgenesTab$EntrezID %in% DEgenes_no3
+DEgenesTab <- DEgenesTab[mask,]
+
 ## ----TMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
@@ -452,6 +479,24 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
+## -----------------------------------------------------------------------------
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+tt3 <- topTable(fit3, coef=2, n=Inf)
+DEgenes_no2 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
+sort(table(tt3[DEgenes_no2, "chr"]), decreasing=TRUE)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+## -----------------------------------------------------------------------------
+mask <- DEgenesTab$EntrezID %in% DEgenes_no2
+DEgenesTab <- DEgenesTab[mask,]
+
 ## ----CMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
@@ -490,7 +535,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## ----warning=FALSE------------------------------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(org.Hs.eg.db)
 library(GOstats)
 library(KEGGREST)
@@ -525,14 +570,20 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
 
 ## -----------------------------------------------------------------------------
+goresults
 
+## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
 
 
 ## -----------------------------------------------------------------------------
+mask <- KEGGresults$OddsRatio != "Inf"
+KEGGresults <- KEGGresults[mask,]
+KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 KEGGresults
+
 
 ## -----------------------------------------------------------------------------
 source("../R/custom_functions.R")
@@ -545,25 +596,18 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 
 ## -----------------------------------------------------------------------------
+KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
 KEGGresults
 
+## ----message=FALSE------------------------------------------------------------
+KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
+KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
+KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
+
+KEGGresults_with_genes
+
 ## -----------------------------------------------------------------------------
-
-KEGGresults$KEGGClassNames
-
-class_names_string <- paste(KEGGresults$KEGGClassNames, collapse = "; ")
-
-class_names_list <- strsplit(class_names_string, "; ")[[1]]
-
-freq_table <- table(class_names_list)
-
-ordered_freq_table <- freq_table[order(-freq_table)]
-
-# Create a bar plot with ordered frequencies and rotated leaf labels
-# Create a larger plotting area
-par(mar = c(6, 6, 4, 2) + 3)
-
-barplot(ordered_freq_table, horiz = FALSE, las = 2, cex.names = 0.8)
 
 
 ## -----------------------------------------------------------------------------

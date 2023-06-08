@@ -366,39 +366,6 @@ legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
 We are left with `r nrow(se.filt)` genes.
 
-<!---
-We are left with `r nrow(se_sample_filtered)` genes.
-
-```{r}
-
-mask <- filterByExpr(dge_sample_filtered, group=colData(se_sample_filtered)$protocolFac)
-se.filt <- se_sample_filtered[mask, ]
-dim(se.filt)
-dge.filt <- dge_sample_filtered[mask, ]
-dim(dge.filt)
-```
-
-We are left with `r nrow(se.filt)` genes.
-
-
-
-
-```{r}
-par(mar=c(4, 5, 1, 1))
-
-h <- hist(avgexp, xlab=expression("Expression level (" * log[2] * "CPM)"), 
-          main="", las=1, col="grey", cex.axis=1.2, cex.lab=1.5)
-
-x <- cut(rowMeans(assays(se.filt)$logCPM), breaks=h$breaks)
-
-lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
-
-legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
-
-```
-
---->
-
 
 ## Normalization
 
