@@ -574,7 +574,6 @@ First, we will observed stage 1 and 2 that correspond to colostrum and transitio
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(sva)
-library(limma)
 ```
 
 ## Between Colostrum and Transitional

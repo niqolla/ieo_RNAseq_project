@@ -302,7 +302,6 @@ plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 
 ## ----message=FALSE, warning=FALSE, paged.print=FALSE--------------------------
 library(sva)
-library(limma)
 
 ## ----CThist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
@@ -606,58 +605,4 @@ KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 KEGGresults
 
-
-## -----------------------------------------------------------------------------
-source("../R/custom_functions.R")
-
-names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
-KEGGresults$Term <- as.data.frame(names_names)$names_names
-
-class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
-KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
-
-
-## -----------------------------------------------------------------------------
-KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
-KEGGresults
-
-## ----message=FALSE------------------------------------------------------------
-KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
-KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
-KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
-KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
-
-KEGGresults_with_genes
-
-## -----------------------------------------------------------------------------
-
-KEGGresults$KEGGClassNames
-
-class_names_string <- paste(KEGGresults$KEGGClassNames, collapse = "; ")
-
-class_names_list <- strsplit(class_names_string, "; ")[[1]]
-
-freq_table <- table(class_names_list)
-
-ordered_freq_table <- freq_table[order(-freq_table)]
-
-# Create a bar plot with ordered frequencies and rotated leaf labels
-# Create a larger plotting area
-par(mar = c(6, 6, 4, 2) + 3)
-
-barplot(ordered_freq_table, horiz = FALSE, las = 2, cex.names = 0.8)
-
-
-## -----------------------------------------------------------------------------
-
-
-
-## -----------------------------------------------------------------------------
-
-## -----------------------------------------------------------------------------
-
-## -----------------------------------------------------------------------------
-
-## -----------------------------------------------------------------------------
-sessionInfo()
 
