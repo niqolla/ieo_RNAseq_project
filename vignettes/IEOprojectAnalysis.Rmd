@@ -544,6 +544,28 @@ legend("bottomright", levels(se.filt$protocolFac),
 In fact, the samples group by lactation stage.
 
 
+
+# adsasdassadffsa
+
+```{r}
+Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
+Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
+Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
+```
+
+```{r}
+plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
+```
+
+```{r}
+plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
+```
+
+```{r}
+plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
+```
+
+
 # Differential expression
 
 We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
@@ -631,6 +653,19 @@ kable_styling(ktab, position="center")
 ```
 
 
+### for volcano
+```{r}
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+```
+
 
 ## Between Transitional and Mature
 
@@ -705,6 +740,20 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
+```
+
+
+### for volcano
+```{r}
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
+colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 ```
 
 
@@ -795,29 +844,17 @@ It is evident that the number of differentially expressed genes that was obtaine
 
 As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
-
-# volcanoooosss
-
+### for volcano
+```{r}
+sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
+mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
-
-
-# adsasdassadffsa
-
-```{r}
-Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
-Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
-Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
-```
-
-```{r}
-plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
-```
-```{r}
-plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
-```
-
-```{r}
-plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
+fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
+fit3 <- eBayes(fit3)
+res3 <- decideTests(fit3, p.value=0.1)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+fit3$genes <- genesmd
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 ```
 
 # Functional analysis
