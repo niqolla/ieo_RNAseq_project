@@ -881,7 +881,7 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
-goresults
+
 ```
 
 redgo <- goresults[goresults$Size >= 3 & goresults$Size <= 300 & goresults$Count >= 29, ]
@@ -907,7 +907,7 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 ```
 
 ```{r}
-goresults
+
 ```
 <!---
 ### KEGG enrichment
