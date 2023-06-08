@@ -796,12 +796,30 @@ It is evident that the number of differentially expressed genes that was obtaine
 As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
 
+# adsasdassadffsa
+
+```{r}
+Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
+Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
+Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
+```
+
+```{r}
+plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
+```
+```{r}
+plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
+```
+
+```{r}
+plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
+```
 
 # Functional analysis
 
 Here we will do the functional analysis.
 
-```{r warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(org.Hs.eg.db)
 library(GOstats)
 library(KEGGREST)
@@ -830,6 +848,12 @@ goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults
 ```
 
+redgo <- goresults[goresults$Size >= 3 & goresults$Size <= 300 & goresults$Count >= 29, ]
+
+In the given context, "Size" refers to the total number of genes associated with a specific Gene Ontology Biological Process ID (GOBPID). It indicates the number of genes in the dataset that are related to the biological process represented by the GOBPID.
+
+On the other hand, "Count" represents the number of genes within the dataset that were found to be associated with the given GOBPID. It indicates the number of genes in the dataset that were experimentally observed or predicted to be involved in the biological process represented by the GOBPID.
+
 ************************ add more constrictions to the filtering!!!!!!!
 
 ```{r message=FALSE, warning=FALSE}
@@ -857,58 +881,13 @@ KEGGresults <- summary(KEGGhgOver)
 ```
 
 ```{r}
+mask <- KEGGresults$OddsRatio != "Inf"
+KEGGresults <- KEGGresults[mask,]
+KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 KEGGresults
-```
-<!---
-```{r}
-getKEGGName <- function(input) {
-  # Construct the KEGG ID
-  kegg_id <- paste0("hsa", input)
-  
-  tryCatch(
-    {
-      # Retrieve KEGG information
-      rezKEGG <- keggGet(kegg_id)
-      name <- rezKEGG[[1]]$NAME
-      name <- gsub(" - Homo sapiens \\(human\\)", "", name)
-      return(name)
-  
-    },
-    error = function(err) {
-      # Code to execute if an error occurs
-      name <- "no info"
-      return(name)
-    }
-  )
-}
+
 ```
 
-```{r}
-getKEGGClass <- function(input) {
-  
-  # Construct the KEGG ID
-  kegg_id <- paste0("hsa", input)
-  
-  tryCatch(
-    {
-      # Retrieve KEGG information
-      rezKEGG <- keggGet(kegg_id)
-      class_name <- rezKEGG[[1]]$CLASS
-      if (is.null(class_name)) {
-        class_name <- "no info"
-      }
-      return(class_name)
-  
-    },
-    error = function(err) {
-      # Code to execute if an error occurs
-      class_name <- "no info"
-      return(class_name)
-    }
-  )
-}
-```
---->
 
 ```{r}
 source("../R/custom_functions.R")
@@ -922,6 +901,7 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 ```
 
 ```{r}
+KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
 KEGGresults
 ```
 
