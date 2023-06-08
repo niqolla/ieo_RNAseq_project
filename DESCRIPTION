@@ -9,6 +9,7 @@ License: Artistic-2.0
 Depends: R (>= 4.0.0), SummarizedExperiment
 Imports: methods, S4Vectors
 Suggests: BiocStyle, knitr, rmarkdown, usethis, kableExtra,
-          edgeR, geneplotter, sva, KernSmooth, org.Hs.eg.db, GOstats, KEGGREST
+          edgeR, geneplotter, sva, KernSmooth, org.Hs.eg.db, GOstats, KEGGREST, 
+          limma
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
