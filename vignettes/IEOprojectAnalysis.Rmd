@@ -591,7 +591,9 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
-
+top7 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+fit3$genes$symbol[top7]
 ```
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -692,6 +694,9 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+top7 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+fit3$genes$symbol[top7]
 ```
 
 ```{r}
@@ -792,6 +797,9 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+top7 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+fit3$genes$symbol[top7]
 ```
 
 ```{r}
