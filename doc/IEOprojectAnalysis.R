@@ -587,7 +587,7 @@ ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
-ktab <- kable(goresults[1:10, 1:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -624,14 +624,101 @@ KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="S
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
+ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
+
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
+
+
+
+## -----------------------------------------------------------------------------
+new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(goresults)) {
+  genes <- strsplit(goresults$Genes[i], ", ")[[1]]
+  term <- rep(goresults$Term[i], length(genes))
+  new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  new_table <- rbind(new_table, new_rows)
+}
+
+
+mask <-new_table$Gene %in% top7_no3 
+goGenesInTop7 <- new_table[mask,]
+
+## -----------------------------------------------------------------------------
+
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no1,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+
+conditional(params) <- TRUE
+hgOverCond <- hyperGTest(params)
+goresults <- summary(hgOverCond)
+
+## -----------------------------------------------------------------------------
+mask <- goresults$OddsRatio != "Inf"
+goresults <- goresults[mask, ]
+goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
+goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
+
+
+## ----message=FALSE, warning=FALSE---------------------------------------------
+geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
+geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
+goresults <- cbind(goresults, Genes=geneSYMs)
+rownames(goresults) <- 1:nrow(goresults)
+
+
+ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
+
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
+
 ## -----------------------------------------------------------------------------
 
 
 ## -----------------------------------------------------------------------------
-
+KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
+KEGGhgOver <- hyperGTest(KEGGparams)
+KEGGresults <- summary(KEGGhgOver)
 
 
 ## -----------------------------------------------------------------------------
+mask <- KEGGresults$OddsRatio != "Inf"
+KEGGresults <- KEGGresults[mask,]
+KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
+
+
+## -----------------------------------------------------------------------------
+source("../R/custom_functions.R")
+
+names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
+KEGGresults$Term <- as.data.frame(names_names)$names_names
+
+class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
+KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
+
+
+## -----------------------------------------------------------------------------
+KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
+
+## ----message=FALSE------------------------------------------------------------
+KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
+KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
+KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
+
+ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
+
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
+
+
 
 ## -----------------------------------------------------------------------------
 

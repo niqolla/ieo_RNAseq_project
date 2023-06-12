@@ -991,18 +991,36 @@ for (i in 1:nrow(goresults)) {
   new_table <- rbind(new_table, new_rows)
 }
 
-
 mask <-new_table$Gene %in% top7_no3 
-goGenesInTop7 <- new_table[mask,]
+goGenesInTop7_no3 <- new_table[mask,]
+
+goGenesInTop7_no3
+```
+```{r}
+KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(KEGGresults_with_genes)) {
+  genes <- strsplit(KEGGresults_with_genes$Genes[i], ", ")[[1]]
+  term <- rep(KEGGresults_with_genes$Term[i], length(genes))
+  KEGG_new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  KEGG_new_table <- rbind(KEGG_new_table, KEGG_new_rows)
+}
+
+mask <-KEGG_new_table$Gene %in% top7_no2 
+KEGGGenesInTop7_no3 <- KEGG_new_table[mask,]
+
+KEGGGenesInTop7_no3
 ```
 
 ## Between Transitional and Mature (no_1)
+
+
 
 ### Go enrichment 
 
 ```{r}
 
-params <- new("GOHyperGParams", geneIds=DEgenesEGs_no1,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
@@ -1014,14 +1032,10 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
-goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
 
+goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
 ```
 
-
-In the given context, "Size" refers to the total number of genes associated with a specific Gene Ontology Biological Process ID (GOBPID). It indicates the number of genes in the dataset that are related to the biological process represented by the GOBPID.
-
-On the other hand, "Count" represents the number of genes within the dataset that were found to be associated with the given GOBPID. It indicates the number of genes in the dataset that were experimentally observed or predicted to be involved in the biological process represented by the GOBPID.
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -1034,7 +1048,7 @@ rownames(goresults) <- 1:nrow(goresults)
 
 ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
-save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
+save_kable(ktab, file="../doc/goresults_no2.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
@@ -1047,7 +1061,7 @@ kable_styling(ktab, position="center")
 ### KEGG enrichment
 
 ```{r}
-KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
+KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
 
@@ -1072,8 +1086,18 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 ```
 
+https://pubmed.ncbi.nlm.nih.gov/30488063/ 
+= sterols
+
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
+= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
+
+
+
+
 ```{r}
-KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
+KEGGresults <- KEGGresults[KEGGresults$Size < 100, ]
 ```
 
 ```{r message=FALSE}
@@ -1084,7 +1108,7 @@ KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
-save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
+save_kable(ktab, file="../doc/KEGGresults_no2.html", self_contained=TRUE)
 
 ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
@@ -1092,16 +1116,168 @@ kable_styling(ktab, position="center")
 
 ```
 
+```{r}
+new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(goresults)) {
+  genes <- strsplit(goresults$Genes[i], ", ")[[1]]
+  term <- rep(goresults$Term[i], length(genes))
+  new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  new_table <- rbind(new_table, new_rows)
+}
+
+mask <-new_table$Gene %in% top7_no2 
+goGenesInTop7_no2 <- new_table[mask,]
+
+goGenesInTop7_no2
+```
+
+```{r}
+KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(KEGGresults_with_genes)) {
+  genes <- strsplit(KEGGresults_with_genes$Genes[i], ", ")[[1]]
+  term <- rep(KEGGresults_with_genes$Term[i], length(genes))
+  KEGG_new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  KEGG_new_table <- rbind(KEGG_new_table, KEGG_new_rows)
+}
+
+mask <-KEGG_new_table$Gene %in% top7_no2 
+KEGGGenesInTop7_no2 <- KEGG_new_table[mask,]
+
+KEGGGenesInTop7_no2
+```
+
+
 ## Between Colostrum and Mature (no_2)
 
 ### Go enrichment 
 
 ```{r}
+
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no2,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+
+conditional(params) <- TRUE
+hgOverCond <- hyperGTest(params)
+goresults <- summary(hgOverCond)
 ```
+
+
+```{r}
+mask <- goresults$OddsRatio != "Inf"
+goresults <- goresults[mask, ]
+goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
+
+goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
+```
+
+
+
+```{r message=FALSE, warning=FALSE}
+geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
+geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
+goresults <- cbind(goresults, Genes=geneSYMs)
+rownames(goresults) <- 1:nrow(goresults)
+
+
+ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/goresults_no2.html", self_contained=TRUE)
+
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
+```
+
 
 ### KEGG enrichment
 
 ```{r}
+KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no2, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
+KEGGhgOver <- hyperGTest(KEGGparams)
+KEGGresults <- summary(KEGGhgOver)
+
+```
+
+```{r}
+mask <- KEGGresults$OddsRatio != "Inf"
+KEGGresults <- KEGGresults[mask,]
+KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
+
+```
+
+
+```{r}
+source("../R/custom_functions.R")
+
+names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
+KEGGresults$Term <- as.data.frame(names_names)$names_names
+
+class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
+KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
+
+```
+
+https://pubmed.ncbi.nlm.nih.gov/30488063/ 
+= sterols
+
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
+= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
+
+
+
+
+```{r}
+KEGGresults <- KEGGresults[KEGGresults$Size < 100, ]
+```
+
+```{r message=FALSE}
+KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
+KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
+KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
+KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
+
+ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
+save_kable(ktab, file="../doc/KEGGresults_no2.html", self_contained=TRUE)
+
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
+
+
+```
+
+```{r}
+new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(goresults)) {
+  genes <- strsplit(goresults$Genes[i], ", ")[[1]]
+  term <- rep(goresults$Term[i], length(genes))
+  new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  new_table <- rbind(new_table, new_rows)
+}
+
+mask <-new_table$Gene %in% top7_no2 
+goGenesInTop7_no2 <- new_table[mask,]
+
+goGenesInTop7_no2
+```
+
+```{r}
+KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
+
+for (i in 1:nrow(KEGGresults_with_genes)) {
+  genes <- strsplit(KEGGresults_with_genes$Genes[i], ", ")[[1]]
+  term <- rep(KEGGresults_with_genes$Term[i], length(genes))
+  KEGG_new_rows <- data.frame(Gene = genes, Term = term, stringsAsFactors = FALSE)
+  KEGG_new_table <- rbind(KEGG_new_table, KEGG_new_rows)
+}
+
+mask <-KEGG_new_table$Gene %in% top7_no2 
+KEGGGenesInTop7_no2 <- KEGG_new_table[mask,]
+
+KEGGGenesInTop7_no2
 ```
 
 
