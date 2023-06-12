@@ -591,8 +591,15 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
-
 ```
+```{r}
+top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
+top7_no3
+```
+
+
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
 DEgenesTab <- DEgenesTab[mask,]
@@ -692,6 +699,13 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+```
+
+```{r}
+top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
+top7_no1
 ```
 
 ```{r}
@@ -795,6 +809,13 @@ volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unkn
 ```
 
 ```{r}
+top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
+top7_no2
+```
+
+```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no2
 DEgenesTab <- DEgenesTab[mask,]
 ```
@@ -882,16 +903,15 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
+goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
 
 ```
 
-redgo <- goresults[goresults$Size >= 3 & goresults$Size <= 300 & goresults$Count >= 29, ]
 
 In the given context, "Size" refers to the total number of genes associated with a specific Gene Ontology Biological Process ID (GOBPID). It indicates the number of genes in the dataset that are related to the biological process represented by the GOBPID.
 
 On the other hand, "Count" represents the number of genes within the dataset that were found to be associated with the given GOBPID. It indicates the number of genes in the dataset that were experimentally observed or predicted to be involved in the biological process represented by the GOBPID.
 
-************************ add more constrictions to the filtering!!!!!!!
 
 ```{r message=FALSE, warning=FALSE}
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
@@ -905,6 +925,8 @@ ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
+ktab <- kable(goresults[1:10, 1:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
 ```
 
 ```{r}

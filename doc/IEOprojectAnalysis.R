@@ -323,6 +323,11 @@ genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 
+## -----------------------------------------------------------------------------
+top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
+top7_no3
 
 ## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -410,6 +415,12 @@ fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 
 ## -----------------------------------------------------------------------------
+top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
+top7_no1
+
+## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
 DEgenesTab <- DEgenesTab[mask,]
 
@@ -495,6 +506,12 @@ fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 
 ## -----------------------------------------------------------------------------
+top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
+top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
+top7_no2
+
+## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no2
 DEgenesTab <- DEgenesTab[mask,]
 
@@ -555,6 +572,7 @@ goresults <- summary(hgOverCond)
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
+goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
 
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
@@ -569,6 +587,8 @@ ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
+ktab <- kable(goresults[1:10, 1:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
 
