@@ -925,12 +925,8 @@ ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
-ktab <- kable(goresults[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("________dasasdasddsa__________",
-                              fnameHTML, fnameCSV))
+ktab <- kable(goresults[1:10, ], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-
-
 ```
 
 ```{r}
