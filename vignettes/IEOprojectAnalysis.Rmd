@@ -593,9 +593,10 @@ fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 ```
 ```{r}
-top7 <- order(fit3$lods[,2], decreasing=TRUE)
+top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
 print("The top 7 genes are:")
-fit3$genes$symbol[top7][1:7]
+top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
+top7_no3
 ```
 
 
@@ -701,9 +702,10 @@ volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unkn
 ```
 
 ```{r}
-top7 <- order(fit3$lods[,2], decreasing=TRUE)
+top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
 print("The top 7 genes are:")
-fit3$genes$symbol[top7][1:7]
+top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
+top7_no1
 ```
 
 ```{r}
@@ -807,9 +809,10 @@ volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unkn
 ```
 
 ```{r}
-top7 <- order(fit3$lods[,2], decreasing=TRUE)
+top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
 print("The top 7 genes are:")
-fit3$genes$symbol[top7][1:7]
+top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
+top7_no2
 ```
 
 ```{r}
