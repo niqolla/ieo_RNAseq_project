@@ -932,7 +932,9 @@ geneUniverse <- rownames(se)
 
 In this part we will perform the functional analysis (FA). The scheme of the analysis is similar to the DE analysis. First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2).
 
-For each of the compared stages we will perform 2 FAs: one for GO enrichment and another for KEGG enrichment. 
+For each of the compared stages we will perform 2 FAs: one for GO enrichment and another for KEGG enrichment. The reasons for also doing a KEGG analysis are two:
+  (1) Following what the authors did in the paper. 
+  (2) GO enrichment analyzes gene sets based on functional annotations from the Gene Ontology, covering a wide range of biological processes - this leaves us with a huge list of enriched pathways. Whereas, KEGG enrichment specifically focuses on identifying overrepresented pathways from the Kyoto Encyclopedia of Genes and Genomes, resulting in a narrower set of enriched pathways compared to the broader functional annotations provided by GO.
 
 ## Between Colostrum and Transitional (no_3)
 
