@@ -1412,7 +1412,7 @@ In comparison with the article [@lemay13] we find similar results.
 
 We also find an DE genes of (iso)ferritins (FTL, FTH1) with enrichment in the GO term "iron ion homeostasis". Furthermore, glycosylation and other sugar modifications are also present (KEGG terms: Glycosphingolipid biosynthesis - globo and isoglobo series, Glycosaminoglycan degradation, Glycosylphosphatidylinositol (GPI)-anchor biosynthesis, Glycan degradation). This processes are probably related to immune functions - antimicrobial role [@Christensen2010]. 
 
-As well as several catabolic processes, suggesting natural pre-digestion of milk proteins [@Dallas2013]. (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:CMGOtab), \@ref(tab:CMGKEGGtab))
+Moreover, several catabolic processes are functionally enriched, suggesting natural pre-digestion of milk proteins [@Dallas2013]. (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:CMGOtab), \@ref(tab:CMGKEGGtab))
 
 ### Comparing Transitional with the two other
 
@@ -1424,8 +1424,47 @@ Finally, in this stage, we also notice the DE of CSN2, a gene encoding milk case
 
 # Conclusions
 
-Here we summarize our conclusions.
+```TO BE PARAPHARSED:
 
+
+Briefly,
+postpartum timing of sample collection ranged between 41–52
+hours for colostral, 39–56 hours for transitional, and 33–130 days
+for mature; and Na:K ratio ranged between 5.5–9.6 for colostral,
+0.70–1.15 for transitional, and 0.19–0.57 for mature.
+
+this study is important because it establishes protocols for extracting RNA from milk and processing it for RNA-seq
+
+***
+
+Stage-specific transcripts are associated with immune
+defense during the colostral stage, up-regulation of the machinery needed for milk protein synthesis during the transitional
+stage, and the production of lipids during mature lactation. 
+
+lactation-stage specific transcripts are
+associated with immune defense during the colostral stage, the up-
+regulation of massive milk protein synthesis during the transitional
+stage, and the full-scale production lipids and other factors during
+the mature stage of lactation
+
+
+* FURTHERMORE:
+In this paper, we describe the extraction and sequencing of
+high-quality RNA from the human milk fat layer over three stages
+of milk production, demonstrating the significance of defining
+lactation stage based on biochemical parameters (versus postpar-
+tum day). 
+We then characterize the RNA-Seq transcriptome
+responsible for the production of biochemically-defined colostrum,
+transitional, and mature milk in humans, including: a) demon-
+strating how RNA-Seq captures the broad dynamic range of gene
+expression within the temporal context of secretory activation and
+lactation; b) functional enrichments of distinct gene expression
+trajectories; c) differential expression of insulin signaling genes; and
+d) differential expression of lactose synthesis genes
+---> mention what we don't do (c, d)
+
+```
 # Session information
 
 ```{r}
