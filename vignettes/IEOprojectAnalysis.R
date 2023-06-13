@@ -1,38 +1,4 @@
----
-title: "RNA Sequencing of the Human Milk Fat Layer Transcriptome Reveals Distinct Gene Expression Profiles at Three Stages of Lactation"
-author:
-- name: "Nikola Panajotovikj, Ester Muñoz del Campo, Marko Ludaic"
-  affiliation: Universitat Pompeu Fabra
-date: "`r Sys.Date()`"
-output:
-  BiocStyle::html_document:
-    toc: true
-    toc_float: true
-    number_sections: true
-    fig_captions: yes
-bibliography: bibliography.bib
-vignette: >
-  %\VignetteIndexEntry{IEOprojectAnalysis}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
-```{=html}
-<!--
-In this first chunk of code, which will not be shown in the resulting
-document (echo=FALSE) sets up global processing options, such as whether
-a comment character should appear before code results (set to the null
-character string in this case), collapse source and output blocks into
-a single code block (collapse=TRUE), align figures to the center
-(fig.align="center") or cache the results to speed up vignette building
-(cache=FALSE thus disabled in this case). A full description of possible
-options can be found at http://yihui.name/knitr/options
---->
-```
-```{r setup, echo=FALSE, cache=FALSE}
+## ----setup, echo=FALSE, cache=FALSE-------------------------------------------
 library(knitr) ## kable()
 library(kableExtra) ## kable_styling(), save_kable()
 library(usethis) ## use_directory(), proj_path()
@@ -47,103 +13,34 @@ knitr::opts_chunk$set(
 ## this option avoid use_directory() being verbose later on
 options(usethis.quiet=TRUE)
 
-```
 
-# Introduction
-
-Because of the numerous benefits breastfeeding provides, it's recommended that infants be exclusively breastfed for the first 6 months with continued breastfeeding for at least 1 year. However lactation is not achieved in all mothers and the physiology of this process remains poorly understood. This is because of questions related to the ethics of performing tests or extracting tissues from lactating mother.
-
-So, an interesting alternative has been proposed – human milk secreted during lactation is a rich source of mammary epithelial cell RNA. About 3–8% of human milk fat globules contain mammary epithelial cell cytoplasmic remnants, including RNA, captured during milk fat globule formation and secretion
-
-Previous to this research, there has been attempt to undestand the human milk fat layer transcriptome with microarray techniques. This paper analyses the transcriptome with RNA-seq which, compared to microarray, has highly sensitive detail, can accurately quantify both very low and very high abundance transcripts, as well as detect novel transcripts.
-
-The authors of this paper [@lemay13], furthermore, suggest that the constitution of the human milk is not dependent on the days postpartum, which is the measure typically used by lactation researchers to categorize lactation stage. Rather, they state that compared to other factors such as subject, washing protocol, or time of collection, biochemically defined lactation stage (i.e., Na:K) has the largest effect on the transcriptome. So they categorise the samples as:  "colostral" if Na:K >= 2.0; and as "transitional" if Na:K  < 2.0;  "mature" if Na:K < 0.6 .
-
-The three main challanges of this paper are:
-
-* because of the sample extraction, it is unknown if the milk fat layer yields RNA purely of mammary epithelial cell origin, or if RNA from non-mammary epithelial sources is also present in the milk fat layer obtained from colostrum, transitional, or mature human milk, 
-
-* because of the body heat and the environment of the milk, the RNA might end up being degraded (low RIN values),
-
-* because this is a study of patients who would agree to participate after just having gone through giving birth and have to fulfill some criteria, the sample size is very small which is something that really influences the information that can be extracted and extrapolated from this sample group - the result of bias of such a small sample group is really apparent in the MA-plots 
-
-
-# Quality assessment
-
-## Data import and cleaning
-
-We start importing the raw table of counts.
-
-```{=html}
-<!--
-The option 'message=FALSE' avoid dumping R messages such as "Loading required package: methods"
-into the output of the report.
--->
-```
-```{r message=FALSE}
+## ----message=FALSE------------------------------------------------------------
 library(SummarizedExperiment)
 se <- readRDS(file.path(system.file("extdata", package="IEOproject"), "GSE45669.rds"))
 #se <- readRDS("../inst/extdata/GSE45669.rds")
 
 se
 
-```
 
-We have `r nrow(se)` genes by `r ncol(se)` samples. From the first row
-and column names shown by the object, we can figure out that genes are
-defined by [Entrez](https://www.ncbi.nlm.nih.gov/gene) [@maglott10]
-identifiers and samples by Sequence Read Archive Run
-([SRR](https://www.ncbi.nlm.nih.gov/books/NBK56913/#search.what_do_the_different_sra_accessi))
-identifiers.
-
-Regarding the samples, we can see that tey are few, so the analysis results quality will be likely affected by this fact. It is important to keep it in mind along the process.
-
-The row data in this object contains information about the profiled
-genes.
-
-```{r}
+## -----------------------------------------------------------------------------
 head(rowData(se))
-```
 
-Among this information, the gene symbol and description are potentially
-useful for interpreting results of, for instance, a differential
-expression analysis. Let's explore now the column (phenotypic) data.
-
-```{r}
+## -----------------------------------------------------------------------------
 dim(colData(se))
 head(colData(se), n=3)
-```
 
-We have a total of `r ncol(colData(se))` phenotypic variables. The
-second column `geo_accession` contains GEO Sample Accession Number
-([GSM](https://www.ncbi.nlm.nih.gov/geo/info/overview.html)) identifiers.
-GSM identifiers define individual samples, understood in our context as
-individual sources of RNA. In this dataset, there are no technical replicates.
-
-To proceed further exploring this dataset, we are going to use the
-[edgeR](https://bioconductor.org/packages/edgeR) package and build a
-`DGEList` object, incorporating the gene metadata, which includes the
-gene symbol.
-
-```{r, message=FALSE}
+## ---- message=FALSE-----------------------------------------------------------
 library(IEOproject)
 library(edgeR)
 
 dge <- DGEList(counts=assays(se)$counts, genes=rowData(se))
 dim(dge)
-```
 
-Calculate $\log_2$ CPM units of expression and put them as an additional
-assay element to ease their manipulation.
-
-```{r}
+## -----------------------------------------------------------------------------
 assays(se)$logCPM <- cpm(dge, log=TRUE,  prior.count=0.25)
 assays(se)$logCPM[1:5, 1:5]
-```
 
-In the codeblock below, we loop through all the columns of the phenotype table to see if there are any variables for which there are groups (batch-effect):
-
-```{r}
+## -----------------------------------------------------------------------------
 
 # loop over the columns and count unique values
 for (col in names(colData(se))) {
@@ -157,30 +54,8 @@ for (col in names(colData(se))) {
   }
 }
 
-```
 
-
-In the output above we can observe the columns containing groups of data values, that means excluding the columns presenting the same value for all samples or a different value for each sample. We can see that
-there are:
-
--   patients that are repeated because their milk was sampled in 2 or 3
-    of the 3 stages of lactation reported in the paper (id numbers: 179,
-    183, 187).
-
--   given the different 3 stages, 3 groups of samples appear (this is a
-    biologically relevant factor): Colostrum lactation
-    stage; Mature lactation stage; Transitional lactation stage.
-
--   because of the different protocols there are 4 different groups
-    (technically relevant) Hard spin, Unwashed ; Hard spin, Washed once
-    ; Hard spin, Washed twice ; Soft spin, Unwashed.
-
-To facilitate handling these variables we are going to recode them as
-follows.
-
-First we replace spaces in column names.
-
-```{r}
+## -----------------------------------------------------------------------------
 # simpler names
 names(colData(se))[37] <- "id"
 names(colData(se))[36] <- "lacStage"
@@ -198,25 +73,16 @@ colData(se)$protocolFac <- factor(colData(se)$protocol,
                                   levels = c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"),
                                   labels = c(1, 2, 3, 4 ))
 
-```
 
-In Table \@ref(tab:pheno) below, we show this variable jointly with lactation stage and protocol to try to gather as much understanding as possible on
-the underlying experimental design.
-
-```{r pheno, echo=FALSE, message=FALSE}
+## ----pheno, echo=FALSE, message=FALSE-----------------------------------------
 tmpdf <- data.frame("Patient"=colData(se)$id,
                     "lacStage"=colData(se)$lacStage,
                     "protocol"=colData(se)$protocol,
                     check.names=FALSE)
 ktab <- kable(tmpdf, caption="Phenotypic variables.")
 kable_styling(ktab, position="center")
-```
 
-## Sequencing depth
-
-Let's examine the sequencing depth in terms of total number of sequence read counts mapped to the genome per sample. The figure below shows the sequencing depth per sample, also known as library sizes, in increasing order.
-
-```{r libsizes, echo=FALSE}
+## ----libsizes, echo=FALSE-----------------------------------------------------
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
@@ -224,11 +90,8 @@ names(ordmreads) <- colnames(se)[ord]
 bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red")[colData(se)$lacStageFac[ord]], las=2, ylim = c(0, 50))
 legend("topleft", c("Colostrum", "Transitional", "Mature"), fill=c("blue", "green", "red"), inset=0.01, cex=0.85)
-```
 
-From the plot above we don't notice any biases related to the different lactation stages (colors). The only thing that stands out is SRR801705 as having very low sequencing depth. In the later part of the analysis we will remove it from the analysis, since it seems to be an error with the sample sequencing.
-
-```{r libsizes_2, echo=FALSE}
+## ----libsizes_2, echo=FALSE---------------------------------------------------
 par(mar=c(7, 5, 2, 2))
 ord <- order(dge$sample$lib.size/1e6)
 ordmreads <- dge$sample$lib.size[ord]/1e6
@@ -237,45 +100,21 @@ bp <- barplot(ordmreads, las=1, ylab="Millions of reads",
               xlab="", col=c("blue", "green", "red", "orange")[colData(se)$protocolFac[ord]], las=2, ylim = c(0, 60))
 legend("topleft", c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"), 
        fill=c("blue", "green", "red", "orange"), inset=0.01, cex=0.85)
-```
 
-From the plot above we do not see any bias. The "Hard spin, Washed once" groups together but there doesn't seem to be a significantly extreme difference in their sequencing depth. We will further analyze this with a clustering approach. 
-
-## Distribution of expression levels among samples
-
-Figure \@ref(fig:distRawExp) below shows the distribution of expression
-values per sample in logarithmic CPM units of expression.
-
-```{=html}
-<!---
-the option echo=FALSE hides the R code. When plotting in general one
-does not want to see the code. Options fig.height and fig.width control
-height and width of the plot in inches while out.height and out.width
-do it in the final output file; see http://yihui.name/knitr/options for
-full details.
---->
-```
-```{r distRawExp, echo=FALSE, fig.height=5, fig.width=5, out.width="600px", fig.cap="Non-parametric density distribution of expression profiles per sample.", message=FALSE}
+## ----distRawExp, echo=FALSE, fig.height=5, fig.width=5, out.width="600px", fig.cap="Non-parametric density distribution of expression profiles per sample.", message=FALSE----
 library(geneplotter)
 par(mar=c(4, 5, 1, 1))
 lst <- as.list(as.data.frame(assays(se)$logCPM))
 multidensity(lst, xlab="log 2 CPM", legend=NULL,
              main="", las=1)
-```
 
-There are no substantial differences between the samples in the
-distribution of expression values.
-
-```{r}
+## -----------------------------------------------------------------------------
 par(mar=c(7, 5, 2, 2))
 boxplot(assays(se)$logCPM, col="gray", ylab=expression(log[2] * "CPM"),
 cex.axis=1.2, cex.lab=1.5, las=2)
 
-```
 
-In the previous plots we see that the SRR801705 sample does not behave differently than the rest, but this is due to the fact that we are now considering the counts per million (CPM), and what is wrong about that sample is the sequencing depth, so still we will exclude it from the analysis.
-
-```{r, echo=FALSE}
+## ---- echo=FALSE--------------------------------------------------------------
 # Create factors for lacStage and protocol
 se$lacStageFac <- factor(colData(se)$lacStage,
                                   levels = c("Colostrum", "Transitional", "Mature"),
@@ -307,32 +146,12 @@ dge_sample_filtered$samples <- dge$samples_masked
 mask <- !grepl("SRR801705", colnames(dge$counts))
 dge_sample_filtered$counts <- dge_sample_filtered$counts[, mask]
 
-```
 
-
-## Distribution of expression levels among genes
-
-Let's calculate now the average expression per gene through all the
-samples. Figure \@ref(fig:exprdist) shows the distribution of those
-values across genes.
-
-```{r exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."}
+## ----exprdist, echo=FALSE, out.width="600px", fig.cap="Distribution of average expression level per gene."----
 avgexp <- rowMeans(assays(se_sample_filtered)$logCPM)
 hist(avgexp, xlab="log2 CPM", main="", las=1, ylim=c(0,8000))
-```
 
-As expected, we have two modes, one for genes that are lowly expressed
-in nearly all samples and another for genes with some detectable levels
-of expression across a number of samples.
-
-
-## Filtering of lowly-expressed genes
-
-In the paper, transcript abundances were estimated as FPKMs (fragments per kilobase of exon per million fragments mapped) using Cufflinks. Genes with a mean expression level less than 0.01 FPKM (manually set) across all time points and all samples were excluded from further analysis.
-
-In our analysis, we use CPM (counts per million) and after some trial and error we found that the best cutoff value from the cpm would be arround 0.1.
-
-```{r}
+## -----------------------------------------------------------------------------
 
 #cpmcutoff <- round(10/min(dge_sample_filtered$sample$lib.size/1e6), digits=1)
 cpmcutoff <- 0.1
@@ -362,44 +181,15 @@ lines(h$mids, table(x), type="h", lwd=10, lend=1, col="darkred")
 
 legend("topright", c("All genes", "Filtered genes"), fill=c("grey", "darkred"))
 
-```
 
-We are left with `r nrow(se.filt)` genes.
-
-
-## Normalization
-
-We calculate now the normalization factors on the filtered expression
-data set.
-
-```{r}
+## -----------------------------------------------------------------------------
 dge.filt <- calcNormFactors(dge.filt)
-```
 
-Replace the raw log2 CPM units in the corresponding assay element of the
-`SummarizedExperiment` object, by the normalized ones.
-
-```{r}
+## -----------------------------------------------------------------------------
 assays(se.filt)$logCPM <- cpm(dge.filt, log=TRUE,
                               normalized.lib.sizes=TRUE)
-```
 
-## MA-plots
-
-We examine now the MA-plots of the normalized expression profiles in
-Figure \@ref(fig:maPlots).
-
-```{=html}
-<!---
-Here we make a MA-plot for each sample. The options 'fig.height'
-and 'fig.width' control the relative image size in *inches*. The
-final image size results from 'height'x'dpi' and 'width'x'dpi',
-where 'dpi' is the image resolution in "dots per inch" (by default
-dpi=72). To scale the image to a desired size use 'out.width' and
-'out.height'. More information at http://yihui.name/knitr/options
---->
-```
-```{r maPlots, fig.height=18, fig.width=10, dpi=100, echo=FALSE, fig.cap="MA-plots of filtered and normalized expression values."}
+## ----maPlots, fig.height=18, fig.width=10, dpi=100, echo=FALSE, fig.cap="MA-plots of filtered and normalized expression values."----
 par(mfrow=c(5, 4), mar=c(4, 5, 3, 1))
 for (i in 1:ncol(se.filt)) {
   A <- rowMeans(assays(se.filt)$logCPM)
@@ -409,32 +199,11 @@ for (i in 1:ncol(se.filt)) {
   lo <- lowess(M ~ A)
   lines(lo$x, lo$y, col="red", lwd=2)
 }
-```
 
-A number of samples display some expression-level dependent bias. For
-cases in which this occurs at the low-end of the expression level, one
-solution could be to have a more stringent filter on minimum expression
-using a grouping with more samples per group, for instance. However, considering the low number of samples we are working with we decide to keep it this way. Of course, we should keep an eye on samples with these biases in case they also display other unexpected features, because then we might consider removing them.
-
-## Experimental design and batch identification
-
-Here try to understand the underlying experimental design. We take a look at the combination of sample preparation protocol and
-lactation stage.
-
-```{r}
+## -----------------------------------------------------------------------------
 table(se.filt$lacStageFac, se.filt$protocolFac)
-```
 
-We can see that not all the protocols have been used in all lactation stages, but still the distribution is quite balanced and the number of missing combinations is not critical for the analysis.
-This means that there are more chances that the differences observed are due to biological reasons rather than technical.
-
-We examine now how samples group together by hierarchical clustering and
-multidimensional scaling, annotating lactation stage (number) and protocol(color) for each sample. We
-calculate again log CPM values with a high prior count(3) to moderate
-extreme fold-changes produced by low counts. The resulting dendrogram is
-shown in Figure \@ref(fig:sampleClusteringTechnique).
-
-```{r sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+## ----sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -460,12 +229,8 @@ plot(sampleDendrogram, main="Hierarchical clustering of samples",
 legend("right", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
-```
 
-We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in the Figure \@ref(fig:sampleClusteringLacStage).
-
-
-```{r sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+## ----sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -490,15 +255,8 @@ plot(sampleDendrogram, main="Hierarchical clustering of samples")
 legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
        legend = c("Colostrum", "Transitional", "Mature"))
-```
 
-
-We can clearly see that the samples group by lactation stage in the clustering, since each cluster contains samples from a lactation stage, with the only exception of the sample SRR801691.
-
-Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
-
-
-```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
+## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."----
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -506,57 +264,26 @@ plotMDS(dge.filt, labels=outcome, col=batch)
 legend("bottomright", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), inset=0.05, 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
-```
 
-In fact, the samples group by lactation stage.
-
-
-# Differential expression
-
-We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
-
-## Analysing Fold-Change
-
-```{r}
+## -----------------------------------------------------------------------------
 Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
 Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
 Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
-```
 
-In Figure \@ref(fig:TraColfig) we analyse the fold-change for the Colostral and Transitional stage. Given that the sample size is only 16 (actually 15, given that we filter 1 because of low quality). 
-
-```{r TraColfig, fig.cap="A plot analysing the difference in expression between Colostral and Transitional stage."}
+## ----TraColfig, fig.cap="A plot analysing the difference in expression between Colostral and Transitional stage."----
 plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
-```
 
-In Figure \@ref(fig:MatColfig) we analyse the fold-change for the Colostral and Mature stage.
-
-```{r MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."}
+## ----MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."----
 plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
-```
 
-In Figure \@ref(fig:TraMatfig) we analyse the fold-change for the Transitional and Mature stage.
-
-```{r TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."}
+## ----TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."----
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
-```
 
-## Performing Differential Expression
-
-First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2). We do the same scheme later for the functional enrichment analysis. 
-
-It's worth mentioning that because with the noise from the low sample size, we end up with a lot of DE genes. To reduce the number of genes and to increase the validity of the DE analysis we perform two DE analysis: one with SVA and one with limma - then we extract the intersection of both those sets. We use this later on for the functional enrichment. 
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(sva)
 library(limma)
-```
 
-## DE Between Colostrum and Transitional
-
-Checking the distribution of differentially expressed genes. In Figure \@ref(fig:CThist) we analyse the differential expression between the Colostrum and Transitional stage.
-
-```{r CThist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."}
+## ----CThist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."----
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -565,9 +292,8 @@ mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 hist(pv, main="", las=1)
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -580,14 +306,8 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
-```
 
-
-### Volcano plot
-
-In the volcano plot below (Figure \@ref(fig:CTvolc)) we 
-
-```{r CTvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."}
+## -----------------------------------------------------------------------------
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -599,33 +319,22 @@ DEgenes_no3 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no3, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
 
-genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), 
-                      symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
-            main="Volcano plot: Colostrum and Transitional (known + unknown)", las=1)
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Volcano plot: Colostrum and Transitional (known + unknown)", las=1)
 
-```
-Extracting the 7 genes with the most extreme log2 Fold Change.
-
-```{r}
+## -----------------------------------------------------------------------------
 top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
+print("The top 7 genes are:")
 top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
-```
+top7_no3
 
-```{r}
-print(toString(c("The top 7 genes are: ", top7_no3)))
-```
-
-```{r}
+## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
 DEgenesTab <- DEgenesTab[mask,]
-```
 
-In the table \@ref(tab:CTtab) the DE genes with lowest p-values are displayed:
-
-```{r CTtab, echo=FALSE, warning=FALSE}
+## ----CTtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -662,13 +371,8 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-```
 
-## DE Between Transitional and Mature
-
-In Figure \@ref(fig:TMhist) we analyse the differential expression between the Colostrum and Transitional stage.
-
-```{r TMhist, fig.cap="P-value diagnostic plot for differental expression between Transitional and Mature."}
+## ----TMhist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -681,8 +385,8 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.05)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
-```
-```{r}
+
+## -----------------------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -696,11 +400,8 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
-```
 
-
-### Volcano plot
-```{r}
+## -----------------------------------------------------------------------------
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -713,23 +414,18 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
 print("The top 7 genes are:")
 top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
 top7_no1
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
 DEgenesTab <- DEgenesTab[mask,]
-```
 
-In the table \@ref(tab:TMtab) the DE genes with lowest p-values are displayed:
-
-```{r TMtab, echo=FALSE, warning=FALSE}
+## ----TMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -766,14 +462,8 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-```
 
-
-## DE Between Colostrum and Mature
-
-In Figure \@ref(fig:CMhist) we analyse the differential expression between the Colostrum and Transitional stage.
-
-```{r CMhist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."}
+## ----CMhist-------------------------------------------------------------------
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -786,8 +476,8 @@ pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
 #sum(p.adjust(pv, method="fdr") < 0.05)
 #sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
-```
-```{r warning=FALSE}
+
+## ----warning=FALSE------------------------------------------------------------
 mask <- p.adjust(pv, method="fdr") < 0.1
 DEgenesEGs <- names(pv)[mask]
 DEgenesSyms <- mcols(se.filt)[DEgenesEGs, "symbol"]
@@ -801,10 +491,8 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          stringsAsFactors=FALSE, check.names=FALSE)
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
-```
 
-### Volcano plot
-```{r}
+## -----------------------------------------------------------------------------
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -817,23 +505,18 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
 print("The top 7 genes are:")
 top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
 top7_no2
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no2
 DEgenesTab <- DEgenesTab[mask,]
-```
 
-In the table \@ref(tab:CMtab) the DE genes with lowest p-values are displayed:
-
-```{r CMtab, echo=FALSE, warning=FALSE}
+## ----CMtab, echo=FALSE, warning=FALSE-----------------------------------------
 ## generate full table in a CSV file and store it in the 'doc' directory
 ## twice, once in 'doc' to enable quickly look up during vignette editing
 ## and building with 'devtools::build_vignettes()' and a second time in
@@ -870,59 +553,30 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
-```
 
-## Summary of DE 
-
-The number of DE genes in the three comparisons above are:
-
-- Colostral-Transitional `r length(DEgenesEGs_no3)` DE genes
-- Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
-- Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
-
-It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
-
-As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
-
-# Functional analysis
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(org.Hs.eg.db)
 library(GOstats)
 library(KEGGREST)
 
 geneUniverse <- rownames(se)
-```
 
-## Between Colostrum and Transitional (no_3)
-
-### Go enrichment 
-
-```{r}
+## -----------------------------------------------------------------------------
 
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
 
-```
 
-
-In the given context, "Size" refers to the total number of genes associated with a specific Gene Ontology Biological Process ID (GOBPID). It indicates the number of genes in the dataset that are related to the biological process represented by the GOBPID.
-
-On the other hand, "Count" represents the number of genes within the dataset that were found to be associated with the given GOBPID. It indicates the number of genes in the dataset that were experimentally observed or predicted to be involved in the biological process represented by the GOBPID.
-
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
 geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
@@ -936,30 +590,23 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 
-```
 
-### KEGG enrichment
-
-```{r}
+## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 source("../R/custom_functions.R")
 
 names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
@@ -968,13 +615,11 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
-```
 
-```{r message=FALSE}
+## ----message=FALSE------------------------------------------------------------
 KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
@@ -988,9 +633,8 @@ ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, capt
 kable_styling(ktab, position="center")
 
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1004,8 +648,8 @@ mask <-new_table$Gene %in% top7_no3
 goGenesInTop7_no3 <- new_table[mask,]
 
 goGenesInTop7_no3
-```
-```{r}
+
+## -----------------------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1019,34 +663,23 @@ mask <-KEGG_new_table$Gene %in% top7_no2
 KEGGGenesInTop7_no3 <- KEGG_new_table[mask,]
 
 KEGGGenesInTop7_no3
-```
 
-## Between Transitional and Mature (no_1)
-
-
-### Go enrichment 
-
-```{r}
+## -----------------------------------------------------------------------------
 
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
-```
 
-
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
 geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
@@ -1060,30 +693,23 @@ save_kable(ktab, file="../doc/goresults_no1.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 
-```
 
-### KEGG enrichment
-
-```{r}
+## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 source("../R/custom_functions.R")
 
 names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
@@ -1092,14 +718,11 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 KEGGresults <- KEGGresults[KEGGresults$Size < 130, ]
-```
 
-```{r message=FALSE}
+## ----message=FALSE------------------------------------------------------------
 KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
@@ -1113,9 +736,8 @@ ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, capt
 kable_styling(ktab, position="center")
 
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1129,9 +751,8 @@ mask <-new_table$Gene %in% top7_no1
 goGenesInTop7_no1 <- new_table[mask,]
 
 goGenesInTop7_no1
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1145,34 +766,23 @@ mask <-KEGG_new_table$Gene %in% top7_no1
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
 KEGGGenesInTop7_no1
-```
 
-
-## Between Colostrum and Mature (no_2)
-
-### Go enrichment 
-
-```{r}
+## -----------------------------------------------------------------------------
 
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no2,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
-```
 
-
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
 geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
@@ -1186,27 +796,20 @@ save_kable(ktab, file="../doc/goresults_no2.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-```
 
-
-### KEGG enrichment
-
-```{r}
+## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no2, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
 
-```
 
-
-```{r}
+## -----------------------------------------------------------------------------
 source("../R/custom_functions.R")
 
 names_names <- sapply(KEGGresults$KEGGID, getKEGGName)
@@ -1215,23 +818,11 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
-```
 
-https://pubmed.ncbi.nlm.nih.gov/30488063/ 
-= sterols
-
-
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
-= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
-
-
-
-
-```{r}
+## -----------------------------------------------------------------------------
 KEGGresults <- KEGGresults[KEGGresults$Size < 100, ]
-```
 
-```{r message=FALSE}
+## ----message=FALSE------------------------------------------------------------
 KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
@@ -1245,9 +836,8 @@ ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, capt
 kable_styling(ktab, position="center")
 
 
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1261,9 +851,8 @@ mask <-new_table$Gene %in% top7_no2
 goGenesInTop7_no2 <- new_table[mask,]
 
 goGenesInTop7_no2
-```
 
-```{r}
+## -----------------------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1277,22 +866,7 @@ mask <-KEGG_new_table$Gene %in% top7_no2
 KEGGGenesInTop7_no2 <- KEGG_new_table[mask,]
 
 KEGGGenesInTop7_no2
-```
 
-
-
-# Discussion
-
-Here we discuss-ting.
-
-# Conclusions
-
-Here we summarize our conclusions.
-
-# Session information
-
-```{r}
+## -----------------------------------------------------------------------------
 sessionInfo()
-```
 
-# References
