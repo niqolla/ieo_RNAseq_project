@@ -950,8 +950,7 @@ hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
 ```
 
-With some trial and error, we decided to set the size to be [3, 100] and the count >= 25. 
-The size represents the number of genes in the pathway, and the count is the number of genes that we calculate as DE.
+With some trial and error, we decided to set the size to be [3, 100] and the count >= 25. The size represents the number of genes in the pathway, and the count is the number of genes that we calculate as DE. This way we include the important but not too general pathways; we are furthermore including only the pathways that have a high number of DE genes in the dataset, ei. the gene sets that are highly enriched.
 
 ```{r}
 mask <- goresults$OddsRatio != "Inf"
@@ -1015,6 +1014,8 @@ class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 ```
+
+With some trial and error, we decided to set the size to be less than 100 as to not include too general terms.
 
 ```{r}
 KEGGresults <- KEGGresults[KEGGresults$Size < 150, ]
