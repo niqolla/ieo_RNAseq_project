@@ -511,7 +511,6 @@ legend("bottomright", levels(se.filt$protocolFac),
 In fact, the samples group by lactation stage.
 
 
-
 # Differential expression
 
 We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
