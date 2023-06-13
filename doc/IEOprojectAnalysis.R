@@ -359,7 +359,7 @@ DEgenesEGs_no3 <- DEgenesEGs[mask]
 ## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
 ## and put its HTML code instead (&lt;)
 ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
-              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between Colostrum and Transitional lactation stages. FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
                               fnameCSV))
 ktab <- kable_styling(ktab,
                       bootstrap_options=c("stripped", "hover", "responsive"),
@@ -372,7 +372,7 @@ save_kable(ktab, file=fpathHTML, self_contained=TRUE)
 
 
 ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between Colostrum and Transitional lactation stages.",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
@@ -402,7 +402,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## ----TMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."----
+## ----TMvolc, fig.cap="P-value diagnostic plot for differental expression between Transitional and Mature"----
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -419,7 +419,7 @@ genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol
 fit3$genes <- genesmd
 
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
-            main="Volcano plot: Colostrum and Mature (known + unknown)", las=1)
+            main="Volcano plot: Transitional and Mature (known + unknown)", las=1)
 
 ## -----------------------------------------------------------------------------
 top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
@@ -453,7 +453,7 @@ DEgenesEGs_no1 <- DEgenesEGs[mask]
 ## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
 ## and put its HTML code instead (&lt;)
 ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
-              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between Transitional and Mature lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
                               fnameCSV))
 ktab <- kable_styling(ktab,
                       bootstrap_options=c("stripped", "hover", "responsive"),
@@ -466,7 +466,7 @@ save_kable(ktab, file=fpathHTML, self_contained=TRUE)
 
 
 ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between Transitional and Mature lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
@@ -499,7 +499,7 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## ----CMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."----
+## ----CMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature"----
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -514,7 +514,7 @@ res3 <- decideTests(fit3, p.value=0.1)
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
 
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Volcano plot: Colostrum and Mature (known + unknown)", las=1)
 
 ## -----------------------------------------------------------------------------
 top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
@@ -548,7 +548,7 @@ DEgenesEGs_no2 <- DEgenesEGs[mask]
 ## into HTML, we need to avoid using the '<' symbol, as in FDR < 10%,
 ## and put its HTML code instead (&lt;)
 ktab <- kable(DEgenesTab, "html", escape=FALSE, row.names=TRUE,
-              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between the 3 lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
+              caption=sprintf("Differentially expressed genes. Differentially expressed genes between between Colostrum and Mature lactaction stages FDR &lt; 10%% (CSV <a href=\"%s\" download>file</a>).",
                               fnameCSV))
 ktab <- kable_styling(ktab,
                       bootstrap_options=c("stripped", "hover", "responsive"),
@@ -561,7 +561,7 @@ save_kable(ktab, file=fpathHTML, self_contained=TRUE)
 
 
 ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between the 3 lactation stages",
+              caption=sprintf("Differentially expressed genes. Top-10 differentially expressed genes with lowest p-value between Colostrum and Mature lactation stages",
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
@@ -600,7 +600,7 @@ goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
 
 ## ----CTGOtab, echo=FALSE------------------------------------------------------
-ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable(goresults, "html", caption="GO results between Colostrum and Transitional")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
@@ -646,7 +646,7 @@ KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 
 ## ----CTKEGGtab, echo=FALSE----------------------------------------------------
-ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results between Colostrum and Transitional")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
 
@@ -677,7 +677,7 @@ mask <-new_table$Gene %in% top7_no3
 goGenesInTop7_no3 <- new_table[mask,]
 
 ktab <- kable(goGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Transitional."))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -694,7 +694,7 @@ mask <-KEGG_new_table$Gene %in% top7_no2
 KEGGGenesInTop7_no3 <- KEGG_new_table[mask,]
 
 ktab <- kable(KEGGGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Transitional."))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -719,7 +719,7 @@ goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
 
 ## ----TMGOtab, echo=FALSE------------------------------------------------------
-ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable(goresults, "html", caption="GO results between Transitional and Mature")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no1.html", self_contained=TRUE)
 
@@ -763,7 +763,7 @@ KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 ## ----TMKEGGtab, echo=FALSE----------------------------------------------------
-ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results between Transitional and Mature")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no1.html", self_contained=TRUE)
 
@@ -792,7 +792,7 @@ mask <-new_table$Gene %in% top7_no1
 goGenesInTop7_no1 <- new_table[mask,]
 
 ktab <- kable(goGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -809,7 +809,7 @@ mask <-KEGG_new_table$Gene %in% top7_no1
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
 ktab <- kable(KEGGGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -834,7 +834,7 @@ goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
 
 ## ----CMGOtab, echo=FALSE------------------------------------------------------
-ktab <- kable(goresults, "html", caption="GO results.")
+ktab <- kable(goresults, "html", caption="GO results between Colostrum and Mature")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no2.html", self_contained=TRUE)
 
@@ -878,7 +878,7 @@ KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 ## ----CMGKEGGtab, echo=FALSE---------------------------------------------------
-ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results between Colostrum and Mature")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no2.html", self_contained=TRUE)
 
@@ -907,7 +907,7 @@ mask <-new_table$Gene %in% top7_no2
 goGenesInTop7_no2 <- new_table[mask,]
 
 ktab <- kable(goGenesInTop7_no2, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Mature"))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
@@ -924,7 +924,7 @@ mask <-KEGG_new_table$Gene %in% top7_no2
 KEGGGenesInTop7_no2 <- KEGG_new_table[mask,]
 
 ktab <- kable(KEGGGenesInTop7_no2, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Mature"))
 kable_styling(ktab, position="center")
 
 ## -----------------------------------------------------------------------------
