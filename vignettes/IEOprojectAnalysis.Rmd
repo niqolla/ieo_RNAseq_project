@@ -901,13 +901,20 @@ The number of DE genes between Colostral-Mature is `r length(DEgenesEGs_no2)`.
 
 ## Summary of DE 
 
+```{r echo=FALSE}
+x <- c(length(DEgenesEGs_no3), length(DEgenesEGs_no1), length(DEgenesEGs_no2))
+y <- c(8015, 1948, 8527)
+correlation_value_with_paper <- cor(x, y)
+```
+
 The number of DE genes in the three comparisons above are:
 
 - Colostral-Transitional `r length(DEgenesEGs_no3)` DE genes
 - Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
 - Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
 
-It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
+It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers in the paper are 8015, 1948 and 8527 respectively - correlation value with our findings `r correlation_value_with_paper`. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
+
 
 As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
