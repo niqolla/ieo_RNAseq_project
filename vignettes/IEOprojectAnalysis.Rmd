@@ -938,7 +938,7 @@ For each of the compared stages we will perform 2 FAs: one for GO enrichment and
 
 ## Between Colostrum and Transitional (no_3)
 
-### Go enrichment 
+### GO enrichment 
 
 ```{r}
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3, 
@@ -950,6 +950,8 @@ hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
 ```
 
+With some trial and error, we decided to set the size to be [3, 100] and the count >= 25. 
+The size represents the number of genes in the pathway, and the count is the number of genes that we calculate as DE.
 
 ```{r}
 mask <- goresults$OddsRatio != "Inf"
@@ -965,14 +967,25 @@ geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", 
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
 goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
+```
 
 
+```{r echo=FALSE}
 ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
-ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("GO Enrichment Between Colostrum and Transitional"))
 kable_styling(ktab, position="center")
+
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "goresults_no3.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
 ```
 
 ### KEGG enrichment
@@ -1013,15 +1026,28 @@ KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="S
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
+```
+
+```{r}
 ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
 
-ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("KEGG Enrichment Between Colostrum and Transitional"))
 kable_styling(ktab, position="center")
 
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "KEGGresults_with_genes_no3.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ```
+
+### Top 7 fold-change in GO enrichment 
 
 ```{r}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1038,6 +1064,8 @@ goGenesInTop7_no3 <- new_table[mask,]
 
 goGenesInTop7_no3
 ```
+
+### Top 7 fold-change in KEGG enrichment
 
 ```{r}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1057,10 +1085,9 @@ KEGGGenesInTop7_no3
 
 ## Between Transitional and Mature (no_1)
 
-### Go enrichment 
+### GO enrichment 
 
 ```{r}
-
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
