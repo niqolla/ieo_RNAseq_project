@@ -968,8 +968,9 @@ goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
 ```
 
+In the Table \@ref(tab:CTGOtab) below, the top 10 GO results (sorted by Odds Ratio) are displayed:
 
-```{r echo=FALSE}
+```{r CTGOtab, echo=FALSE} 
 ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
@@ -993,16 +994,15 @@ write.csv(goresults, fpathCSV, row.names=FALSE)
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
-
 ```
 
 ```{r}
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
-
 ```
 
+So far we have only included the KEGG IDs. The following 2 functions (getKEGGName and getKEGGClass) add the KEGG name and class to each row. (Note: some are unavailable and so are labeled "no info".)
 
 ```{r}
 source("../R/custom_functions.R")
@@ -1012,7 +1012,6 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
-
 ```
 
 With some trial and error, we decided to set the size to be less than 100 as to not include too general terms.
@@ -1029,7 +1028,9 @@ KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 ```
 
-```{r}
+In the Table \@ref(tab:CTGKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
+
+```{r CTGKEGGtab, echo=FALSE}
 ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
