@@ -1390,13 +1390,19 @@ kable_styling(ktab, position="center")
 
 # Discussion
 
-Here we discuss-ting.
+## Interpreting findings of DE and FA between Colostrum and Transitional
 
-https://pubmed.ncbi.nlm.nih.gov/30488063/ 
-= sterols
+The first most significant hit in the KEGG Enrichment table made by comparing Colostrum and Transitional stage suggest that Lipid Metabolism is quite important in the first stage of lactation (\@ref(tab:CTKEGGtab)). The corresponding term for this KEGG class name is fatty acid biosynthesis which indicates that the early synthesis of fatty acids is crucial and beneficial for the milk production. Literature suggest that breastfeeding has a fundamental role in nourishing offspring by supplying a lipid-rich product that is used to create heat and metabolic fuel. Lipids are therefore a necessity for the newborn mammals since they provide heat mediated by the uncoupling of mitochondrial respiration in specific fat depots [Rszer2021]. Additionally, fatty acid elongation has been found as significant KEGG term for the same lactation stage along with glycosphingolipid biosynthesis and aminosugar and nucleotide sugar metabolism.
 
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
-= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
+## Interpreting findings of DE and FA between Transitional and Mature
+
+Protein localization to endoplasmic reticulum is the most significant GO Enrichment term in DE analysis between Transitional and Mature lactation stages (\@ref(tab:TMGOtab)) Scientific research [HonvoHouto2016] suggest that this is connected with the importance of casein transport, a family of related phosphoproteins that are commonly found in mammalian milk and are synthesized and transported along the secretory pathway and released by exocytosis. Endoplasmic reticulum and the secretory vesicles contribute significantly to the milk fat globule membrane formation and since caseins are secreted by exocytosis there is a need for generating a stable molecular transport system. Second most significant GO term is described as endoplasmic reticulum organization which additionally confirms the importance of this organelle between these two lactation stages. 
+
+KEGG Enrichment between Transitional and Mature lactation stages (\@ref(tab:TMKEGGtab)) didn’t show much difference in comparison to the previous group. It is evident that biosynthesis of glycosphinoglipids and unsaturated fatty acid is still very important with the addition of steroid biosynthesis. A study from 2018 [Hamdan2018] determined the contents of sterols in the pools of colostrum, transitional and up to 6-month old human milk. Their results showed that the sterol content varies depending on the lactation stage with the highest bio-accessibility in the first lactation stage. 
+
+## Interpreting findings of DE and FA between Colostrum and Mature
+
+GO Enrichment in this groups (\@ref(tab:CMGOtab)) showed regulation of autophagy of mitochondrion as a number one GO term. Extreme starvation induces the intracellular recycling of nutrients in order to sustain energy resources and life. Although excessive starvation itself is destructive, the induction of autophagy is required for recycling of intracellular contents to maintain energetic homeostasis under restricted nutrient conditions [Webster2014] The absolute requirement of this intracellular recycling for energetic homeostasis is evident in neonates during the postpartum period where the initial maternal production of milk is insufficient for the infant’s energy needs  [Kuma2004]. This would suggest that maternal genes could provide products that are regulators of autophagy and are therefore needed in order to ensure the neonates homeostasis once the autophagy begins.
 
 # Conclusions
 
