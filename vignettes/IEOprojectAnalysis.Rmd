@@ -1410,7 +1410,9 @@ In comparison with the article [@lemay13] we find similar results.
 
 ### Comparing Colostral with the two other
 
-We also find an DE genes of (iso)ferritins (FTL, FTH1) with enrichment in the GO term "iron ion homeostasis". Furthermore, glycosylation and other sugar modifications are also present (KEGG terms: Glycosphingolipid biosynthesis - globo and isoglobo series, Glycosaminoglycan degradation, Glycosylphosphatidylinositol (GPI)-anchor biosynthesis, Glycan degradation). As well as several catabolic processes, suggesting natural pre-digestion of milk proteins [@Dallas2013]. (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:CMGOtab), \@ref(tab:CMGKEGGtab))
+We also find an DE genes of (iso)ferritins (FTL, FTH1) with enrichment in the GO term "iron ion homeostasis". Furthermore, glycosylation and other sugar modifications are also present (KEGG terms: Glycosphingolipid biosynthesis - globo and isoglobo series, Glycosaminoglycan degradation, Glycosylphosphatidylinositol (GPI)-anchor biosynthesis, Glycan degradation). This processes are probably related to immune functions - antimicrobial role [@Christensen2010]. 
+
+As well as several catabolic processes, suggesting natural pre-digestion of milk proteins [@Dallas2013]. (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:CMGOtab), \@ref(tab:CMGKEGGtab))
 
 ### Comparing Transitional with the two other
 
