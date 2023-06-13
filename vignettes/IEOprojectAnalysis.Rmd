@@ -515,8 +515,6 @@ In fact, the samples group by lactation stage.
 
 We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
 
-
-
 ## Analysing Fold-Change
 
 ```{r}
@@ -525,21 +523,29 @@ Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
 Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
 ```
 
-In Figure \@ref(fig:TraColfig) 
+In Figure \@ref(fig:TraColfig) we analyse the fold-change for the Colostral and Transitional stage. Given that the sample size is only 16 (actually 15, given that we filter 1 because of low quality). 
 
 ```{r TraColfig, fig.cap="A plot analysing the difference in expression between Colostral and Transitional stage."}
 plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
 ```
 
+In Figure \@ref(fig:MatColfig) we analyse the fold-change for the Colostral and Mature stage.
+
 ```{r MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."}
 plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
 ```
+
+In Figure \@ref(fig:TraMatfig) we analyse the fold-change for the Transitional and Mature stage.
 
 ```{r TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."}
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 ```
 
-First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclud transitional stage (stage 2).
+## Performing Differential Expression
+
+First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2). We do the same scheme later for the functional enrichment analysis. 
+
+It's worth mentioning that because with the noise from the low sample size, we end up with a lot of DE genes. To reduce the number of genes and to increase the validity of the DE analysis we perform two DE analysis: one with SVA and one with limma - then we extract the intersection of both those sets. We use this later on for the functional enrichment. 
 
 ```{r message=FALSE, warning=FALSE}
 library(sva)
@@ -649,9 +655,6 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
-
-
-
 ## DE Between Transitional and Mature
 
 Checking the distribution of differentially expressed genes:
@@ -757,7 +760,6 @@ kable_styling(ktab, position="center")
 ```
 
 
-
 ## DE Between Colostrum and Mature
 
 Checking the distribution of differentially expressed genes:
@@ -861,13 +863,11 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
-
 The number of DE genes in the three comparisons above are:
 
 - Colostral-Transitional `r length(DEgenesEGs_no3)` DE genes
 - Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
 - Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
-
 
 It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
 
