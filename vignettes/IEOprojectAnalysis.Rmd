@@ -1420,7 +1420,7 @@ In this stage, we also find that there is an increase in the translational activ
 
 ### Comparing Mature with the two other
 
-Finally, in this stage, we also notice 
+Finally, in this stage, we also notice the DE of CSN2, a gene encoding milk casein (b-casein) with the GO term "lactation" (Table \@ref(tab:CMGOtab)).
 
 # Conclusions
 
