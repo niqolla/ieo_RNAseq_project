@@ -1097,6 +1097,7 @@ hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
 ```
 
+With some trial and error, we decided to set the size to be [3, 100] and the count >= 15, for the same reasons mentioned before.
 
 ```{r}
 mask <- goresults$OddsRatio != "Inf"
@@ -1106,26 +1107,31 @@ goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
 ```
 
-
-
 ```{r message=FALSE, warning=FALSE}
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
 geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
 goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
+```
 
+In the Table \@ref(tab:TMGOtab) below, the top 10 GO results (sorted by Odds Ratio) are displayed:
 
+```{r TMGOtab, echo=FALSE}
 ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no1.html", self_contained=TRUE)
 
-ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("GO Enrichment Between Transitional and Mature"))
 kable_styling(ktab, position="center")
-```
 
-```{r}
-
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "goresults_no1.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
 ```
 
 ### KEGG enrichment
@@ -1134,16 +1140,15 @@ kable_styling(ktab, position="center")
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no1, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
-
 ```
 
 ```{r}
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
-
 ```
 
+Adding the KEGG name and class to each row.
 
 ```{r}
 source("../R/custom_functions.R")
@@ -1156,6 +1161,7 @@ KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
 
 ```
 
+With some trial and error, we decided to set the size to be less than 130 as to not include too general terms.
 
 ```{r}
 KEGGresults <- KEGGresults[KEGGresults$Size < 130, ]
@@ -1166,16 +1172,28 @@ KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
+```
 
+In the Table \@ref(tab:TMGKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
+
+```{r TMGKEGGtab, echo=FALSE}
 ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no1.html", self_contained=TRUE)
 
-ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("KEGG Enrichment Between Transitional and Mature"))
 kable_styling(ktab, position="center")
 
-
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "KEGGresults_with_genes_no1.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 ```
+
+
 
 ```{r}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
