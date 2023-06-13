@@ -565,6 +565,11 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
+## ----echo=FALSE---------------------------------------------------------------
+x <- c(length(DEgenesEGs_no3), length(DEgenesEGs_no1), length(DEgenesEGs_no2))
+y <- c(8015, 1948, 8527)
+correlation_value_with_paper <- cor(x, y)
+
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 library(org.Hs.eg.db)
 library(GOstats)
