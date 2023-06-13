@@ -1028,10 +1028,10 @@ KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 
 ```
 
-In the Table \@ref(tab:CTGKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
+In the Table \@ref(tab:CTKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
 
-```{r CTGKEGGtab, echo=FALSE}
-ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+```{r CTKEGGtab, echo=FALSE}
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no3.html", self_contained=TRUE)
 
@@ -1064,7 +1064,9 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no3 
 goGenesInTop7_no3 <- new_table[mask,]
 
-goGenesInTop7_no3
+ktab <- kable(goGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
 
 ### Top 7 fold-change in KEGG enrichment
@@ -1082,7 +1084,9 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no2 
 KEGGGenesInTop7_no3 <- KEGG_new_table[mask,]
 
-KEGGGenesInTop7_no3
+ktab <- kable(KEGGGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
 
 ## Between Transitional and Mature (no_1)
@@ -1158,7 +1162,6 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
-
 ```
 
 With some trial and error, we decided to set the size to be less than 130 as to not include too general terms.
@@ -1174,10 +1177,10 @@ KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
 ```
 
-In the Table \@ref(tab:TMGKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
+In the Table \@ref(tab:TMKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
 
-```{r TMGKEGGtab, echo=FALSE}
-ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+```{r TMKEGGtab, echo=FALSE}
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no1.html", self_contained=TRUE)
 
@@ -1193,7 +1196,7 @@ fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 ```
 
-
+### Top 7 fold-change in GO enrichment 
 
 ```{r}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1208,8 +1211,12 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no1 
 goGenesInTop7_no1 <- new_table[mask,]
 
-goGenesInTop7_no1
+ktab <- kable(goGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
+
+### Top 7 fold-change in KEGG enrichment
 
 ```{r}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1224,7 +1231,9 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no1 
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
-KEGGGenesInTop7_no1
+ktab <- kable(KEGGGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
 
 
@@ -1233,7 +1242,6 @@ KEGGGenesInTop7_no1
 ### Go enrichment 
 
 ```{r}
-
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no2,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
@@ -1241,6 +1249,7 @@ hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
 ```
 
+With some trial and error, we decided to set the size to be [3, 100] and the count >= 15, for the same reasons mentioned before.
 
 ```{r}
 mask <- goresults$OddsRatio != "Inf"
@@ -1250,24 +1259,32 @@ goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=15, ]
 ```
 
-
-
 ```{r message=FALSE, warning=FALSE}
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
 geneSYMs <- sapply(geneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 geneSYMs <- sapply(geneSYMs, paste, collapse=", ")
 goresults <- cbind(goresults, Genes=geneSYMs)
 rownames(goresults) <- 1:nrow(goresults)
+```
 
+In the Table \@ref(tab:CMGOtab) below, the top 10 GO results (sorted by Odds Ratio) are displayed:
 
+```{r CMGOtab, echo=FALSE}
 ktab <- kable(goresults, "html", caption="GO results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/goresults_no2.html", self_contained=TRUE)
 
-ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("GO Enrichment Between Colostrum and Mature"))
 kable_styling(ktab, position="center")
-```
 
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "goresults_no2.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(goresults, fpathCSV, row.names=FALSE)
+```
 
 ### KEGG enrichment
 
@@ -1275,16 +1292,15 @@ kable_styling(ktab, position="center")
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no2, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")
 KEGGhgOver <- hyperGTest(KEGGparams)
 KEGGresults <- summary(KEGGhgOver)
-
 ```
 
 ```{r}
 mask <- KEGGresults$OddsRatio != "Inf"
 KEGGresults <- KEGGresults[mask,]
 KEGGresults <- KEGGresults[order(KEGGresults$OddsRatio, decreasing = TRUE), ]
-
 ```
 
+Adding the KEGG name and class to each row.
 
 ```{r}
 source("../R/custom_functions.R")
@@ -1294,18 +1310,9 @@ KEGGresults$Term <- as.data.frame(names_names)$names_names
 
 class_names <- sapply(KEGGresults$KEGGID, getKEGGClass)
 KEGGresults$KEGGClassNames <- as.data.frame(class_names)$class_names
-
 ```
 
-https://pubmed.ncbi.nlm.nih.gov/30488063/ 
-= sterols
-
-
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
-= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
-
-
-
+With some trial and error, we decided to set the size to be less than 100 as to not include too general terms.
 
 ```{r}
 KEGGresults <- KEGGresults[KEGGresults$Size < 100, ]
@@ -1316,16 +1323,28 @@ KEGGgeneIDs <- geneIdsByCategory(KEGGhgOver)[KEGGresults$KEGGID]
 KEGGgeneSYMs <- sapply(KEGGgeneIDs, function(id) select(org.Hs.eg.db, columns="SYMBOL", key=id, keytype="ENTREZID")$SYMBOL)
 KEGGgeneSYMs <- sapply(KEGGgeneSYMs, paste, collapse=", ")
 KEGGresults_with_genes <- cbind(KEGGresults, Genes=KEGGgeneSYMs)
+```
 
-ktab <- kable(KEGGresults_with_genes, "html", caption="GO results.")
+In the Table \@ref(tab:CMGKEGGtab) below, the top 10 KEGG results (sorted by Odds Ratio) are displayed:
+
+```{r CMGKEGGtab, echo=FALSE}
+ktab <- kable(KEGGresults_with_genes, "html", caption="KEGG results.")
 ktab <- kable_styling(ktab, bootstrap_options=c("stripped", "hover", "responsive"), fixed_thead=TRUE)
 save_kable(ktab, file="../doc/KEGGresults_no2.html", self_contained=TRUE)
 
-ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
+ktab <- kable(KEGGresults[1:10, 2:8], "html", escape=FALSE, row.names=TRUE, caption=sprintf("KEGG Enrichment Between Colostrum and Mature"))
 kable_styling(ktab, position="center")
 
-
+use_directory(file.path("doc"))
+use_directory(file.path("inst", "doc"))
+fnameCSV <- "KEGGresults_with_genes_no2.csv"
+fpathCSV <- proj_path(file.path("doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
+fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
+write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 ```
+
+### Top 7 fold-change in GO enrichment
 
 ```{r}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1340,8 +1359,12 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no2 
 goGenesInTop7_no2 <- new_table[mask,]
 
-goGenesInTop7_no2
+ktab <- kable(goGenesInTop7_no2, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
+
+### Top 7 fold-change in KEGG enrichment
 
 ```{r}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1356,7 +1379,9 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no2 
 KEGGGenesInTop7_no2 <- KEGG_new_table[mask,]
 
-KEGGGenesInTop7_no2
+ktab <- kable(KEGGGenesInTop7_no2, "html", escape=FALSE, row.names=TRUE, 
+              caption=sprintf("Top 7 fold-change genes in GO enriched pathways"))
+kable_styling(ktab, position="center")
 ```
 
 
@@ -1364,6 +1389,17 @@ KEGGGenesInTop7_no2
 # Discussion
 
 Here we discuss-ting.
+
+
+
+https://pubmed.ncbi.nlm.nih.gov/30488063/ 
+= sterols
+
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
+= Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
+
+
 
 # Conclusions
 
