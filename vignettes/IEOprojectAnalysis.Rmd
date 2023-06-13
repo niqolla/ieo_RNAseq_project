@@ -936,7 +936,7 @@ For each of the compared stages we will perform 2 FAs: one for GO enrichment and
   (1) Following what the authors did in the paper. 
   (2) GO enrichment analyzes gene sets based on functional annotations from the Gene Ontology, covering a wide range of biological processes - this leaves us with a huge list of enriched pathways. Whereas, KEGG enrichment specifically focuses on identifying overrepresented pathways from the Kyoto Encyclopedia of Genes and Genomes, resulting in a narrower set of enriched pathways compared to the broader functional annotations provided by GO.
 
-## Between Colostrum and Transitional (no_3)
+## Between Colostrum and Transitional
 
 ### GO enrichment 
 
@@ -1089,7 +1089,7 @@ ktab <- kable(KEGGGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
-## Between Transitional and Mature (no_1)
+## Between Transitional and Mature
 
 ### GO enrichment 
 
@@ -1237,7 +1237,7 @@ kable_styling(ktab, position="center")
 ```
 
 
-## Between Colostrum and Mature (no_2)
+## Between Colostrum and Mature
 
 ### Go enrichment 
 
@@ -1390,16 +1390,11 @@ kable_styling(ktab, position="center")
 
 Here we discuss-ting.
 
-
-
 https://pubmed.ncbi.nlm.nih.gov/30488063/ 
 = sterols
 
-
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7396598/ 
 = Similarly, propionate has been shown to protect against allergic airway disease in mice via its effects on dendritic cell biology
-
-
 
 # Conclusions
 
