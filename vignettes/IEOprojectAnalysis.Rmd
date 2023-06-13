@@ -936,7 +936,7 @@ For each of the compared stages we will perform 2 FAs: one for GO enrichment and
   (1) Following what the authors did in the paper. 
   (2) GO enrichment analyzes gene sets based on functional annotations from the Gene Ontology, covering a wide range of biological processes - this leaves us with a huge list of enriched pathways. Whereas, KEGG enrichment specifically focuses on identifying overrepresented pathways from the Kyoto Encyclopedia of Genes and Genomes, resulting in a narrower set of enriched pathways compared to the broader functional annotations provided by GO.
   
-Finally, for each pair of stages, we will also look at the the top 7 fold-change genes previously extracted. (This is more of an analysis that we simply did becuase of interest in how much the enrichemnt is related to the fold-change of a gene.)
+Finally, for each pair of stages, we will also look at the the top 7 fold-change genes previously extracted and their presence in the enriched gene sets. (This is more of an analysis that we simply did becuase of interest in how much the enrichemnt is related to the fold-change of a gene.)
 
 ## Between Colostrum and Transitional
 
