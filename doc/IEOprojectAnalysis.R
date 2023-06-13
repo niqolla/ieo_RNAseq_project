@@ -270,25 +270,24 @@ Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
 Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
 Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
 
-## -----------------------------------------------------------------------------
+## ----TraColfig, fig.cap="A plot analysing the difference in expression between Colostral and Transitional stage."----
 plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
 
-## -----------------------------------------------------------------------------
+## ----MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."----
 plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
 
-## -----------------------------------------------------------------------------
+## ----TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."----
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 library(sva)
 library(limma)
 
-## ----CThist-------------------------------------------------------------------
+## ----CThist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."----
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
+mod <- model.matrix(~ se.filt.all$stage, colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
@@ -306,28 +305,34 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          Description=DEgenesDesc,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
-# rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 
-## -----------------------------------------------------------------------------
+## ----CTvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."----
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
 tt3 <- topTable(fit3, coef=2, n=Inf)
+
 DEgenes_no3 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no3, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
-genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), 
+                      symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
+            main="Volcano plot: Colostrum and Transitional (known + unknown)", las=1)
+
 
 ## -----------------------------------------------------------------------------
 top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
-top7_no3
+
+## -----------------------------------------------------------------------------
+print(paste("The top 7 genes are", paste(top7_no3, collapse = ", "), sep = ": "))
 
 ## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -346,7 +351,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no3 <- DEgenesEGs
+DEgenesEGs_no3 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -371,18 +376,15 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## ----TMhist-------------------------------------------------------------------
+## ----TMhist, fig.cap="P-value diagnostic plot for differental expression between Transitional and Mature."----
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
+mod <- model.matrix(~ se.filt.all$stage, colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-#sum(p.adjust(pv, method="fdr") < 0.05)
-#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 
 ## -----------------------------------------------------------------------------
@@ -397,28 +399,34 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          Description=DEgenesDesc,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## -----------------------------------------------------------------------------
+## ----TMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."----
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
+
 tt3 <- topTable(fit3, coef=2, n=Inf)
 DEgenes_no1 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no1, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
+
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+
 fit3$genes <- genesmd
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
+            main="Volcano plot: Colostrum and Mature (known + unknown)", las=1)
 
 ## -----------------------------------------------------------------------------
 top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
-top7_no1
+
+## -----------------------------------------------------------------------------
+print(paste("The top 7 genes are", paste(top7_no1, collapse = ", "), sep = ": "))
 
 ## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -437,7 +445,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no1 <- DEgenesEGs
+DEgenesEGs_no1 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -462,7 +470,7 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
                               fnameHTML, fnameCSV))
 kable_styling(ktab, position="center")
 
-## ----CMhist-------------------------------------------------------------------
+## ----CMhist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."----
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -491,25 +499,29 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
 DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 
-## -----------------------------------------------------------------------------
+## ----CMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."----
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
 tt3 <- topTable(fit3, coef=2, n=Inf)
+
 DEgenes_no2 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no2, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
+
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
+
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 
 ## -----------------------------------------------------------------------------
 top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
-top7_no2
+
+## -----------------------------------------------------------------------------
+print(paste("The top 7 genes are", paste(top7_no2, collapse = ", "), sep = ": "))
 
 ## -----------------------------------------------------------------------------
 mask <- DEgenesTab$EntrezID %in% DEgenes_no2
@@ -528,7 +540,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no2 <- DEgenesEGs
+DEgenesEGs_no2 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -561,8 +573,9 @@ library(KEGGREST)
 geneUniverse <- rownames(se)
 
 ## -----------------------------------------------------------------------------
-
-params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3, 
+              universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", 
+              ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
@@ -573,7 +586,6 @@ mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
-
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 geneIDs <- geneIdsByCategory(hgOverCond)[goresults$GOBPID]
@@ -589,9 +601,6 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-
-## -----------------------------------------------------------------------------
-
 
 ## -----------------------------------------------------------------------------
 KEGGparams <- new("KEGGHyperGParams", geneIds=DEgenesEGs_no3, universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", pvalueCutoff=0.05, testDirection="over")

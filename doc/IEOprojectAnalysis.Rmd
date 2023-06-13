@@ -511,8 +511,11 @@ legend("bottomright", levels(se.filt$protocolFac),
 In fact, the samples group by lactation stage.
 
 
+# Differential expression
 
-# adsasdassadffsa
+We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
+
+## Analysing Fold-Change
 
 ```{r}
 Col_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Colostrum"])
@@ -520,40 +523,44 @@ Tra_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Transitional"])
 Mat_exp <- rowMeans(logCPM[, se_sample_filtered$lacStage=="Mature"])
 ```
 
-```{r}
+In Figure \@ref(fig:TraColfig) we analyse the fold-change for the Colostral and Transitional stage. Given that the sample size is only 16 (actually 15, given that we filter 1 because of low quality). 
+
+```{r TraColfig, fig.cap="A plot analysing the difference in expression between Colostral and Transitional stage."}
 plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
 ```
 
-```{r}
+In Figure \@ref(fig:MatColfig) we analyse the fold-change for the Colostral and Mature stage.
+
+```{r MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."}
 plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
 ```
 
-```{r}
+In Figure \@ref(fig:TraMatfig) we analyse the fold-change for the Transitional and Mature stage.
+
+```{r TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."}
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 ```
 
+## Performing Differential Expression
 
-# Differential expression
+First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2). We do the same scheme later for the functional enrichment analysis. 
 
-We now perform an analysis to observe differential expressed (DE) genes by excluding each of the 3 lactation stages one by one. This is also the approach that is described in the paper.
-
-First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclud colostrum stage (stage 1) and finally we will exclud transitional stage (stage 2).
+It's worth mentioning that because with the noise from the low sample size, we end up with a lot of DE genes. To reduce the number of genes and to increase the validity of the DE analysis we perform two DE analysis: one with SVA and one with limma - then we extract the intersection of both those sets. We use this later on for the functional enrichment. 
 
 ```{r message=FALSE, warning=FALSE}
 library(sva)
 library(limma)
 ```
 
-## Between Colostrum and Transitional
+## DE Between Colostrum and Transitional
 
-Checking the distribution of differentially expressed genes:
+Checking the distribution of differentially expressed genes. In Figure \@ref(fig:CThist) we analyse the differential expression between the Colostrum and Transitional stage.
 
-```{r CThist}
+```{r CThist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=3]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
+mod <- model.matrix(~ se.filt.all$stage, colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
@@ -572,39 +579,50 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          Description=DEgenesDesc,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
-# rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 ```
 
 
-### for volcano
-```{r}
+### Volcano plot
+
+In the volcano plot below (Figure \@ref(fig:CTvolc)) we analyse the DE genes between Colostrum and Transitional.
+
+```{r CTvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
 tt3 <- topTable(fit3, coef=2, n=Inf)
+
 DEgenes_no3 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no3, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
-genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+
+genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), 
+                      symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
+            main="Volcano plot: Colostrum and Transitional (known + unknown)", las=1)
+
 ```
+Extracting the 7 genes with the most extreme log2 Fold Change.
+
 ```{r}
 top7_no3 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
-top7_no3
 ```
 
+```{r}
+print(paste("The top 7 genes are", paste(top7_no3, collapse = ", "), sep = ": "))
+```
+Keeping the intersection of both DE analysis.
 
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
 DEgenesTab <- DEgenesTab[mask,]
 ```
-
 
 In the table \@ref(tab:CTtab) the DE genes with lowest p-values are displayed:
 
@@ -621,7 +639,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no3 <- DEgenesEGs
+DEgenesEGs_no3 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -647,25 +665,21 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
+The number of DE genes between Colostral-Transitional is `r length(DEgenesEGs_no3)`.
 
+## DE Between Transitional and Mature
 
+In Figure \@ref(fig:TMhist) we analyse the differential expression between the Colostrum and Transitional stage.
 
-## Between Transitional and Mature
-
-Checking the distribution of differentially expressed genes:
-
-```{r TMhist}
+```{r TMhist, fig.cap="P-value diagnostic plot for differental expression between Transitional and Mature."}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
+mod <- model.matrix(~ se.filt.all$stage, colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-#sum(p.adjust(pv, method="fdr") < 0.05)
-#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
 ```{r}
@@ -680,33 +694,46 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          Description=DEgenesDesc,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
 
-### for volcano
-```{r}
+### Volcano plot
+
+In the volcano plot below (Figure \@ref(fig:TMvolc)) we analyse the DE genes between Colostrum and Mature
+
+```{r TMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
+
 tt3 <- topTable(fit3, coef=2, n=Inf)
 DEgenes_no1 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no1, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
+
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
+
 fit3$genes <- genesmd
-volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
+
+volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, 
+            main="Volcano plot: Colostrum and Mature (known + unknown)", las=1)
 ```
+
+Extracting the 7 genes with the most extreme log2 Fold Change.
 
 ```{r}
 top7_no1 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no1 <- fit3$genes$symbol[top7_no1][1:7]
-top7_no1
 ```
+
+```{r}
+print(paste("The top 7 genes are", paste(top7_no1, collapse = ", "), sep = ": "))
+```
+Keeping the intersection of both DE analysis.
 
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -728,7 +755,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no1 <- DEgenesEGs
+DEgenesEGs_no1 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -754,15 +781,13 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
+The number of DE genes between Transitional-Mature is `r length(DEgenesEGs_no1)`.
 
+## DE Between Colostrum and Mature
 
+In Figure \@ref(fig:CMhist) we analyse the differential expression between the Colostrum and Transitional stage.
 
-
-## Between Colostrum and Mature
-
-Checking the distribution of differentially expressed genes:
-
-```{r CMhist}
+```{r CMhist, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."}
 se.filt.all <- se.filt[,se.filt$lacStageFac!=2]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
@@ -792,28 +817,39 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
-### for volcano
-```{r}
+### Volcano plot
+In the volcano plot below (Figure \@ref(fig:CMvolc)) we analyse the DE genes between Colostrum and Mature.
+
+```{r CMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
 fit3 <- lmFit(assays(se.filt.all)$logCPM, mod)
 fit3 <- eBayes(fit3)
 tt3 <- topTable(fit3, coef=2, n=Inf)
+
 DEgenes_no2 <- rownames(tt3)[tt3$adj.P.Val < 0.1]
 sort(table(tt3[DEgenes_no2, "chr"]), decreasing=TRUE)
 res3 <- decideTests(fit3, p.value=0.1)
+
 genesmd <- data.frame(chr=as.character(seqnames(rowRanges(se.filt.all))), symbol=rowData(se.filt.all)[, 5], stringsAsFactors=FALSE)
 fit3$genes <- genesmd
+
 volcanoplot(fit3, coef=2, highlight=7, names=fit3$genes$symbol, main="Known+Unknown covariates", las=1)
 ```
 
+Extracting the 7 genes with the most extreme log2 Fold Change.
+
 ```{r}
 top7_no2 <- order(fit3$lods[,2], decreasing=TRUE)
-print("The top 7 genes are:")
 top7_no2 <- fit3$genes$symbol[top7_no2][1:7]
-top7_no2
 ```
+
+```{r}
+print(paste("The top 7 genes are", paste(top7_no2, collapse = ", "), sep = ": "))
+```
+
+Keeping the intersection of both DE analysis.
 
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no2
@@ -835,7 +871,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no2 <- DEgenesEGs
+DEgenesEGs_no2 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -861,6 +897,9 @@ ktab <- kable(DEgenesTab[1:10, ], "html", escape=FALSE, row.names=TRUE,
 kable_styling(ktab, position="center")
 ```
 
+The number of DE genes between Colostral-Mature is `r length(DEgenesEGs_no2)`.
+
+## Summary of DE 
 
 The number of DE genes in the three comparisons above are:
 
@@ -868,14 +907,11 @@ The number of DE genes in the three comparisons above are:
 - Transitional-Mature `r length(DEgenesEGs_no1)` DE genes
 - Colostral-Mature `r length(DEgenesEGs_no2)` DE genes.
 
-
 It is evident that the number of differentially expressed genes that was obtained in each of the three analysis is quite in line with the number that was reported in the paper. There the observed numbers are 8015, 1948 and 8527 respectively. These numbers are quite large and we think it makes sense because of the nature of the tissue, since the milk should adapt to the infant's needs.
 
 As we mentioned, the sample size is quite small in our case, so that gives rise to different biases which can be dealt with using different strategies, and yielding slightly different results.
 
 # Functional analysis
-
-Here we will do the functional analysis.
 
 ```{r message=FALSE, warning=FALSE}
 library(org.Hs.eg.db)
@@ -890,8 +926,9 @@ geneUniverse <- rownames(se)
 ### Go enrichment 
 
 ```{r}
-
-params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
+params <- new("GOHyperGParams", geneIds=DEgenesEGs_no3, 
+              universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", 
+              ontology="BP", pvalueCutoff=0.05, testDirection="over")
 
 conditional(params) <- TRUE
 hgOverCond <- hyperGTest(params)
@@ -904,13 +941,7 @@ mask <- goresults$OddsRatio != "Inf"
 goresults <- goresults[mask, ]
 goresults <- goresults[order(goresults$OddsRatio, decreasing=TRUE), ]
 goresults <- goresults[goresults$Size >= 3 & goresults$Size <= 100 & goresults$Count >=25, ]
-
 ```
-
-
-In the given context, "Size" refers to the total number of genes associated with a specific Gene Ontology Biological Process ID (GOBPID). It indicates the number of genes in the dataset that are related to the biological process represented by the GOBPID.
-
-On the other hand, "Count" represents the number of genes within the dataset that were found to be associated with the given GOBPID. It indicates the number of genes in the dataset that were experimentally observed or predicted to be involved in the biological process represented by the GOBPID.
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -927,10 +958,6 @@ save_kable(ktab, file="../doc/goresults_no3.html", self_contained=TRUE)
 
 ktab <- kable(goresults[1:10, 2:7], "html", escape=FALSE, row.names=TRUE, caption=sprintf("________dasasdasddsa__________"))
 kable_styling(ktab, position="center")
-```
-
-```{r}
-
 ```
 
 ### KEGG enrichment
@@ -996,6 +1023,7 @@ goGenesInTop7_no3 <- new_table[mask,]
 
 goGenesInTop7_no3
 ```
+
 ```{r}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
@@ -1013,7 +1041,6 @@ KEGGGenesInTop7_no3
 ```
 
 ## Between Transitional and Mature (no_1)
-
 
 ### Go enrichment 
 
