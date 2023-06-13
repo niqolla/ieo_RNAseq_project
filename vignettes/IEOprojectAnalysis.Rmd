@@ -585,7 +585,7 @@ DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ]
 
 ### Volcano plot
 
-In the volcano plot below (Figure \@ref(fig:CTvolc)) we 
+In the volcano plot below (Figure \@ref(fig:CTvolc)) we analyse the DE genes between Colostrum and Transitional.
 
 ```{r CTvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Transitional."}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
@@ -615,8 +615,9 @@ top7_no3 <- fit3$genes$symbol[top7_no3][1:7]
 ```
 
 ```{r}
-print(toString(c("The top 7 genes are: ", top7_no3)))
+print(paste("The top 7 genes are", paste(top7_no3, collapse = ", "), sep = ": "))
 ```
+Keeping the intersection of both DE analysis.
 
 ```{r}
 mask <- DEgenesTab$EntrezID %in% DEgenes_no3
@@ -638,7 +639,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no3 <- DEgenesEGs
+DEgenesEGs_no3 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -672,14 +673,11 @@ In Figure \@ref(fig:TMhist) we analyse the differential expression between the C
 se.filt.all <- se.filt[,se.filt$lacStageFac!=1]
 se.filt.all$stage <- droplevels(se.filt.all$lacStageFac)
 
-mod <- model.matrix(~ se.filt.all$stage,
-                    colData(se.filt.all))
+mod <- model.matrix(~ se.filt.all$stage, colData(se.filt.all))
 mod0 <- model.matrix(~ 1, colData(se.filt.all))
 
 
 pv <- f.pvalue(assays(se.filt.all)$logCPM, mod, mod0)
-#sum(p.adjust(pv, method="fdr") < 0.05)
-#sum(p.adjust(pv, method="fdr") < 0.1)
 hist(pv, main="", las=1)
 ```
 ```{r}
@@ -694,13 +692,16 @@ DEgenesTab <- data.frame(EntrezID=DEgenesEGs,
                          Description=DEgenesDesc,
                          "P value"=DEgenesPvalue,
                          stringsAsFactors=FALSE, check.names=FALSE)
-DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] ## order by p-value
+DEgenesTab <- DEgenesTab[order(DEgenesTab[["P value"]]), ] 
 rownames(DEgenesTab) <- 1:nrow(DEgenesTab)
 ```
 
 
 ### Volcano plot
-```{r}
+
+In the volcano plot below (Figure \@ref(fig:TMvolc)) we analyse the DE genes between Colostrum and Mature
+
+```{r TMvolc, fig.cap="P-value diagnostic plot for differental expression between Colostrum and Mature."}
 sv <- sva(assays(se.filt.all)$logCPM, mod=mod, mod0=mod0)
 mod <- cbind(mod, sv$sv)
 colnames(mod) <- c(colnames(mod)[1:2], paste0("SV", 1:sv$n))
@@ -742,7 +743,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no1 <- DEgenesEGs
+DEgenesEGs_no1 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
@@ -846,7 +847,7 @@ write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(DEgenesTab, fpathCSV, row.names=FALSE)
 
-DEgenesEGs_no2 <- DEgenesEGs
+DEgenesEGs_no2 <- DEgenesEGs[mask]
 
 ## generate full table in HTML and store it into the 'doc' directory
 ## twice, just as we did with the CSV file. note that because the
