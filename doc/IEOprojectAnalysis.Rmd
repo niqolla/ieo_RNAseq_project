@@ -930,7 +930,7 @@ library(KEGGREST)
 geneUniverse <- rownames(se)
 ```
 
-In this part we will perform the functional analysis (FA). The scheme of the analysis is similar to the DE analysis. First, we will observed stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the maturation stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2).
+In this part we will perform the functional analysis (FA). The scheme of the analysis is similar to the DE analysis. First, we will observe stage 1 and 2 that correspond to colostrum and transitional stage, leaving out the mature stage (stage 3). Afterwards, we will exclude colostrum stage (stage 1) and finally we will exclude transitional stage (stage 2).
 
 For each of the compared stages we will perform 2 FAs: one for GO enrichment and another for KEGG enrichment. The reasons for also doing a KEGG analysis are two:
   (1) Following what the authors did in the paper. 
@@ -952,7 +952,7 @@ hgOverCond <- hyperGTest(params)
 goresults <- summary(hgOverCond)
 ```
 
-With some trial and error, we decided to set the size to be [3, 100] and the count >= 25. The size represents the number of genes in the pathway, and the count is the number of genes that we calculate as DE. This way we include the important but not too general pathways; we are furthermore including only the pathways that have a high number of DE genes in the dataset, ei. the gene sets that are highly enriched.
+With some trial and error, we decided to set the size to be [3, 100] and the count >= 25. The size represents the number of genes in the GO terms, and the count is the number of genes that we calculate as DE. This way we include the important but not too general pathways; we are furthermore including only the pathways that have a high number of DE genes in the dataset, ei. the gene sets that are highly enriched.
 
 ```{r}
 mask <- goresults$OddsRatio != "Inf"
@@ -1404,10 +1404,67 @@ KEGG Enrichment between Transitional and Mature lactation stages (\@ref(tab:TMKE
 
 GO Enrichment in this groups (\@ref(tab:CMGOtab)) showed regulation of autophagy of mitochondrion as a number one GO term. Extreme starvation induces the intracellular recycling of nutrients in order to sustain energy resources and life. Although excessive starvation itself is destructive, the induction of autophagy is required for recycling of intracellular contents to maintain energetic homeostasis under restricted nutrient conditions [@Webster2014] The absolute requirement of this intracellular recycling for energetic homeostasis is evident in neonates during the postpartum period where the initial maternal production of milk is insufficient for the infant’s energy needs  [@Kuma2004]. This would suggest that maternal genes could provide products that are regulators of autophagy and are therefore needed in order to ensure the neonates homeostasis once the autophagy begins.
 
+## Cross-referencing with the given article
+
+In comparison with the article [@lemay13] we find similar results. 
+
+### Comparing Colostral with the two other
+
+We also find an DE genes of (iso)ferritins (FTL, FTH1) with enrichment in the GO term "iron ion homeostasis". Furthermore, glycosylation and other sugar modifications are also present (KEGG terms: Glycosphingolipid biosynthesis - globo and isoglobo series, Glycosaminoglycan degradation, Glycosylphosphatidylinositol (GPI)-anchor biosynthesis, Glycan degradation). This processes are probably related to immune functions - antimicrobial role [@Christensen2010]. 
+
+Moreover, several catabolic processes are functionally enriched, suggesting natural pre-digestion of milk proteins [@Dallas2013]. (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:CMGOtab), \@ref(tab:CMGKEGGtab))
+
+### Comparing Transitional with the two other
+
+In this stage, we also find that there is an increase in the translational activity and overall ribosomal proteins (KEGG terms: Ribosome, Protein export; GO term: translational initiation). (Tables \@ref(tab:CTGOtab), \@ref(tab:CTKEGGtab), \@ref(tab:TMGOtab), \@ref(tab:TMKEGGtab))
+
+### Comparing Mature with the two other
+
+Finally, in this stage, we also notice the DE of CSN2, a gene encoding milk casein (b-casein) with the GO term "lactation" (Table \@ref(tab:CMGOtab)).
+
 # Conclusions
 
-Here we summarize our conclusions.
+```TO BE PARAPHARSED:
 
+
+Briefly,
+postpartum timing of sample collection ranged between 41–52
+hours for colostral, 39–56 hours for transitional, and 33–130 days
+for mature; and Na:K ratio ranged between 5.5–9.6 for colostral,
+0.70–1.15 for transitional, and 0.19–0.57 for mature.
+
+this study is important because it establishes protocols for extracting RNA from milk and processing it for RNA-seq
+
+***
+
+Stage-specific transcripts are associated with immune
+defense during the colostral stage, up-regulation of the machinery needed for milk protein synthesis during the transitional
+stage, and the production of lipids during mature lactation. 
+
+lactation-stage specific transcripts are
+associated with immune defense during the colostral stage, the up-
+regulation of massive milk protein synthesis during the transitional
+stage, and the full-scale production lipids and other factors during
+the mature stage of lactation
+
+
+* FURTHERMORE:
+In this paper, we describe the extraction and sequencing of
+high-quality RNA from the human milk fat layer over three stages
+of milk production, demonstrating the significance of defining
+lactation stage based on biochemical parameters (versus postpar-
+tum day). 
+We then characterize the RNA-Seq transcriptome
+responsible for the production of biochemically-defined colostrum,
+transitional, and mature milk in humans, including: a) demon-
+strating how RNA-Seq captures the broad dynamic range of gene
+expression within the temporal context of secretory activation and
+lactation; b) functional enrichments of distinct gene expression
+trajectories; c) differential expression of insulin signaling genes; and
+d) differential expression of lactose synthesis genes
+---> mention what we don't do (c, d)
+
+```
 # Session information
 
 ```{r}
