@@ -1429,11 +1429,11 @@ Not all lactating mothers report that they have achieved their desired amount of
 
 Furthermore, the authors show that, contrary to previous medical belief, the lactational stages do not cluster according to days postpartum, but according to one important biochemical parameter – the ratio of Na:K content. The authors suggest three stages of milk secretion: Colostral (Na:K >= 2.0;), Transitional (Na:K < 2.0) and Mature (Na:K < 0.6). 
 
-When we analyzed the MA-plots (Figure \@ref(fig:maPlots)) we found that some samples displayed expression-level dependent bias. This goes hand-in-hand with the fact that:
+When analyzing the MA-plots (Figure \@ref(fig:maPlots)) we found that some samples displayed expression-level dependent bias. This goes hand-in-hand with the fact that:
 * because of the sample extraction, it is unknown if the milk fat layer yields RNA purely of mammary epithelial cell origin, or if RNA from non-mammary epithelial sources is also present in the milk fat layer obtained from colostrum, transitional, or mature human milk, and
-* because of the body heat and the environment of the milk, the RNA might end up being degraded (low RIN values).
+* because of the body heat and the environment of the milk, RNA might end up being degraded (low RIN values).
 
-Moreover, when we looked at the experimental design and batch identification we could only find one potential batch factor – the protocol used for RNA extraction. However, using hierarchical clustering (Figures \@ref(fig:sampleClusteringTechnique), \@ref(fig:sampleClusteringLacStage)) and a multidimensional scaling plot (Figure \@ref(fig:mdsPlot)) we saw that the samples did not group by this technical factor, rather they grouped by the stage of lactation.
+Moreover, when we looked at the experimental design and batch identification we could only find one potential batch factor – the protocol used for RNA extraction. However, using hierarchical clustering (Figures \@ref(fig:sampleClusteringTechnique), \@ref(fig:sampleClusteringLacStage)) and a multidimensional scaling plot (Figure \@ref(fig:mdsPlot)) we saw that samples did not group by this technical factor, but rather they grouped by the stage of lactation.
 
 From the obtained results, it is evident that there is a high need for establishing a good immune defense system during the colostral stage of lactation and the production of lipids should be also finished during the mature stage of lactation. During the transitional stage, the up-regulation of massive milk protein synthesis and organization seems to be the most important task. Such results indicate that it is possible to define a lactation stage based on biochemical parameters from RNA expression profiles and these findings are in line with the reported results from the given article [@lemay13] .
 

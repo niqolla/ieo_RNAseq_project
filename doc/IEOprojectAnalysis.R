@@ -203,7 +203,7 @@ for (i in 1:ncol(se.filt)) {
 ## -----------------------------------------------------------------------------
 table(se.filt$lacStageFac, se.filt$protocolFac)
 
-## ----sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+## ----sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples by technical factor - protocol used."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -223,14 +223,14 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of samples",
+plot(sampleDendrogram, main="Hierarchical clustering by protocol used.",
      cex=2.0, cex.axis=1.9, cex.main=1.9)
 
 legend("right", levels(se.filt$protocolFac),
        fill=seq_len(nlevels(se.filt$protocolFac)), 
        legend=c("Soft spin, Unwashed", "Hard spin, Unwashed", "Hard spin, Washed once", "Hard spin, Washed twice"))
 
-## ----sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."----
+## ----sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples by biological factor - lactation stage."----
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -250,13 +250,13 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of samples")
+plot(sampleDendrogram, main="Hierarchical clustering by lactation stage.")
 
 legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
        legend = c("Colostrum", "Transitional", "Mature"))
 
-## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."----
+## -----------------------------------------------------------------------------
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
