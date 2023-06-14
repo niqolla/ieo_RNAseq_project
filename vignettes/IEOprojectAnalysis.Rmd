@@ -434,7 +434,7 @@ calculate again log CPM values with a high prior count(3) to moderate
 extreme fold-changes produced by low counts. The resulting dendrogram is
 shown in Figure \@ref(fig:sampleClusteringTechnique).
 
-```{r sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+```{r sampleClusteringTechnique, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples by technical factor - protocol used."}
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -454,7 +454,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of samples",
+plot(sampleDendrogram, main="Hierarchical clustering of the samples by technical factor - protocol used.",
      cex=2.0, cex.axis=1.9, cex.main=1.9)
 
 legend("right", levels(se.filt$protocolFac),
@@ -465,7 +465,7 @@ legend("right", levels(se.filt$protocolFac),
 We can see that the samples do not seem to group by protocol. Now we will test if they group by lactation stage in the Figure \@ref(fig:sampleClusteringLacStage).
 
 
-```{r sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples. Labels correspond to treatment and sample identifer, while colors indicate sample group."}
+```{r sampleClusteringLacStage, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Hierarchical clustering of the samples by biological factor - lactation stage."}
 par(mar=c(8, 5, 1, 1))
 logCPM <- cpm(dge.filt, log=TRUE, prior.count=3)
 d <- as.dist(1-cor(logCPM, method="spearman"))
@@ -485,7 +485,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of samples")
+plot(sampleDendrogram, main="Hierarchical clustering of the samples by biological factor - lactation stage.")
 
 legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
@@ -498,7 +498,6 @@ We can clearly see that the samples group by lactation stage in the clustering, 
 Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
 
-```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
