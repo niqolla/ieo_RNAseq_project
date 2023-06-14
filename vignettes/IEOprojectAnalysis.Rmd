@@ -55,7 +55,7 @@ Because of the numerous benefits breastfeeding provides, it's recommended that i
 
 So, an interesting alternative has been proposed – human milk secreted during lactation is a rich source of mammary epithelial cell RNA. About 3–8% of human milk fat globules contain mammary epithelial cell cytoplasmic remnants, including RNA, captured during milk fat globule formation and secretion
 
-Previous to this research, there has been attempt to undestand the human milk fat layer transcriptome with microarray techniques. This paper analyses the transcriptome with RNA-seq which, compared to microarray, has highly sensitive detail, can accurately quantify both very low and very high abundance transcripts, as well as detect novel transcripts.
+Previous to this research, there has been attempt to undestand the human milk fat layer transcriptome with microarray techniques [@Maningat2009]. This paper analyses the transcriptome with RNA-seq which, compared to microarray, has highly sensitive detail, can accurately quantify both very low and very high abundance transcripts, as well as detect novel transcripts.
 
 The authors of this paper [@lemay13], furthermore, suggest that the constitution of the human milk is not dependent on the days postpartum, which is the measure typically used by lactation researchers to categorize lactation stage. Rather, they state that compared to other factors such as subject, washing protocol, or time of collection, biochemically defined lactation stage (i.e., Na:K) has the largest effect on the transcriptome. So they categorise the samples as:  "colostral" if Na:K >= 2.0; and as "transitional" if Na:K  < 2.0;  "mature" if Na:K < 0.6 .
 
