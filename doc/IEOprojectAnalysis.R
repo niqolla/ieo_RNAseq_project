@@ -256,7 +256,7 @@ legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
        legend = c("Colostrum", "Transitional", "Mature"))
 
-## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."----
+## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to lactation stage and colors indicate protocol used."----
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)

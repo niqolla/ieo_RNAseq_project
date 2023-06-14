@@ -497,7 +497,7 @@ We can clearly see that the samples group by lactation stage in the clustering, 
 
 Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
-```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
+```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to lactation stage and colors indicate protocol used."}
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -1205,7 +1205,7 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-In the Table \@ref(tab:TOP7TMGO) we see the GO terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
+In the code block below we see the GO terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
 
 ```{r TOP7TMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1225,7 +1225,7 @@ dim(goGenesInTop7_no1)
 
 ### Top 7 fold-change in KEGG enrichment
 
-In the Table \@ref(tab:TOP7TMKEGG) we see the KEGG terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
+In the code block below we see the KEGG terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
 
 ```{r TOP7TMKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
