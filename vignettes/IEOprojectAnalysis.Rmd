@@ -454,7 +454,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of the samples by technical factor - protocol used.",
+plot(sampleDendrogram, main="Hierarchical clustering by protocol used.",
      cex=2.0, cex.axis=1.9, cex.main=1.9)
 
 legend("right", levels(se.filt$protocolFac),
@@ -485,7 +485,7 @@ sampleDendrogram <- dendrapply(sampleDendrogram,
                                  x
                                }, batch, outcome)
 
-plot(sampleDendrogram, main="Hierarchical clustering of the samples by biological factor - lactation stage.")
+plot(sampleDendrogram, main="Hierarchical clustering by lactation stage.")
 
 legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
@@ -497,7 +497,7 @@ We can clearly see that the samples group by lactation stage in the clustering, 
 
 Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
-
+```{r}
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -1401,7 +1401,7 @@ KEGG Enrichment between Transitional and Mature lactation stages (\@ref(tab:TMKE
 
 ## Interpreting findings of DE and FA between Colostrum and Mature
 
-GO Enrichment in this groups (\@ref(tab:CMGOtab)) showed regulation of autophagy of mitochondrion as a number one GO term. Extreme starvation induces the intracellular recycling of nutrients in order to sustain energy resources and life. Although excessive starvation itself is destructive, the induction of autophagy is required for recycling of intracellular contents to maintain energetic homeostasis under restricted nutrient conditions [@Webster2014] The absolute requirement of this intracellular recycling for energetic homeostasis is evident in neonates during the postpartum period where the initial maternal production of milk is insufficient for the infant’s energy needs  [@Kuma2004]. This would suggest that maternal genes could provide products that are regulators of autophagy and are therefore needed in order to ensure the neonates homeostasis once the autophagy begins.
+GO Enrichment in this groups (Table \@ref(tab:CMGOtab)) showed regulation of autophagy of mitochondrion as a number one GO term. Extreme starvation induces the intracellular recycling of nutrients in order to sustain energy resources and life. Although excessive starvation itself is destructive, the induction of autophagy is required for recycling of intracellular contents to maintain energetic homeostasis under restricted nutrient conditions [@Webster2014] The absolute requirement of this intracellular recycling for energetic homeostasis is evident in neonates during the postpartum period where the initial maternal production of milk is insufficient for the infant’s energy needs  [@Kuma2004]. This would suggest that maternal genes could provide products that are regulators of autophagy and are therefore needed in order to ensure the neonates homeostasis once the autophagy begins.
 
 ## Cross-referencing with the given article
 
