@@ -256,7 +256,7 @@ legend("topright", levels(se.filt$lacStageFac),
        fill=seq_len(nlevels(se.filt$lacStageFac)),
        legend = c("Colostrum", "Transitional", "Mature"))
 
-## -----------------------------------------------------------------------------
+## ----mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."----
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -663,7 +663,7 @@ fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 
-## -----------------------------------------------------------------------------
+## ----TOP7CTGO-----------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -680,7 +680,7 @@ ktab <- kable(goGenesInTop7_no3, "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Transitional."))
 kable_styling(ktab, position="center")
 
-## -----------------------------------------------------------------------------
+## ----TOP7CTKEGG---------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -778,7 +778,7 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
-## -----------------------------------------------------------------------------
+## ----TOP7TMGO-----------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -791,11 +791,9 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no1 
 goGenesInTop7_no1 <- new_table[mask,]
 
-ktab <- kable(goGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(goGenesInTop7_no1)
 
-## -----------------------------------------------------------------------------
+## ----TOP7TMKEGG---------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -808,9 +806,7 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no1 
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
-ktab <- kable(KEGGGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(KEGGGenesInTop7_no1)
 
 ## -----------------------------------------------------------------------------
 params <- new("GOHyperGParams", geneIds=DEgenesEGs_no2,universeGeneIds=geneUniverse, annotation="org.Hs.eg.db", ontology="BP", pvalueCutoff=0.05, testDirection="over")
@@ -893,7 +889,7 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 fpathCSV <- proj_path(file.path("inst", "doc", fnameCSV))
 write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
-## -----------------------------------------------------------------------------
+## ----TOP7CMGO-----------------------------------------------------------------
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -910,7 +906,7 @@ ktab <- kable(goGenesInTop7_no2, "html", escape=FALSE, row.names=TRUE,
               caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Colostrum and Mature"))
 kable_styling(ktab, position="center")
 
-## -----------------------------------------------------------------------------
+## ----TOP7CMKEGG---------------------------------------------------------------
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {

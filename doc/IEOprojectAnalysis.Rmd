@@ -497,7 +497,7 @@ We can clearly see that the samples group by lactation stage in the clustering, 
 
 Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
-```{r}
+```{r mdsPlot, fig.height=5, fig.width=8, dpi=100, echo=FALSE, fig.cap="Figure S7: Multidimensional scaling plot of the samples. Labels correspond to treatment and colors indicate sample group."}
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -1054,7 +1054,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-```{r}
+In the Table \@ref(tab:TOP7CTGO) we see the GO terms related to the top 7 fold-change genes between Colostrum and Transitional.
+
+```{r TOP7CTGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1074,7 +1076,9 @@ kable_styling(ktab, position="center")
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CTKEGG) we see the KEGG terms related to the top 7 fold-change genes between Colostrum and Transitional.
+
+```{r TOP7CTKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1201,7 +1205,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-```{r}
+In the Table \@ref(tab:TOP7TMGO) we see the GO terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
+
+```{r TOP7TMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1214,14 +1220,14 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no1 
 goGenesInTop7_no1 <- new_table[mask,]
 
-ktab <- kable(goGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(goGenesInTop7_no1)
 ```
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7TMKEGG) we see the KEGG terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
+
+```{r TOP7TMKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1234,9 +1240,7 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no1 
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
-ktab <- kable(KEGGGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(KEGGGenesInTop7_no1)
 ```
 
 
@@ -1349,7 +1353,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CMGO) we see the GO terms related to the top 7 fold-change genes between Colostrum and Mature.
+
+```{r TOP7CMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1369,7 +1375,9 @@ kable_styling(ktab, position="center")
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CMKEGG) we see the KEGG terms related to the top 7 fold-change genes between Colostrum and Mature.
+
+```{r TOP7CMKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1430,7 +1438,9 @@ Not all lactating mothers report that they have achieved their desired amount of
 Furthermore, the authors show that, contrary to previous medical belief, the lactational stages do not cluster according to days postpartum, but according to one important biochemical parameter – the ratio of Na:K content. The authors suggest three stages of milk secretion: Colostral (Na:K >= 2.0;), Transitional (Na:K < 2.0) and Mature (Na:K < 0.6). 
 
 When analyzing the MA-plots (Figure \@ref(fig:maPlots)) we found that some samples displayed expression-level dependent bias. This goes hand-in-hand with the fact that:
+
 * because of the sample extraction, it is unknown if the milk fat layer yields RNA purely of mammary epithelial cell origin, or if RNA from non-mammary epithelial sources is also present in the milk fat layer obtained from colostrum, transitional, or mature human milk, and
+
 * because of the body heat and the environment of the milk, RNA might end up being degraded (low RIN values).
 
 Moreover, when we looked at the experimental design and batch identification we could only find one potential batch factor – the protocol used for RNA extraction. However, using hierarchical clustering (Figures \@ref(fig:sampleClusteringTechnique), \@ref(fig:sampleClusteringLacStage)) and a multidimensional scaling plot (Figure \@ref(fig:mdsPlot)) we saw that samples did not group by this technical factor, but rather they grouped by the stage of lactation.
