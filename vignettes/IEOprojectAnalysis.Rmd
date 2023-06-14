@@ -530,7 +530,7 @@ In Figure \@ref(fig:TraColfig) we analyse the fold-change for the Colostral and 
 plot((Tra_exp+Col_exp)/2, Tra_exp-Col_exp, pch=".", cex=4, las=1)
 ```
 
-In Figure \@ref(fig:MatColfig) we analyse the fold-change for the Colostral and Mature stage.
+In Figure \@ref(fig:MatColfig) we analyse the fold-change for the Colostral and Mature stage. 
 
 ```{r MatColfig, fig.cap="A plot analysing the difference in expression between Colostral and Mature stage."}
 plot((Mat_exp+Col_exp)/2, Mat_exp-Col_exp, pch=".", cex=4, las=1)
@@ -541,6 +541,8 @@ In Figure \@ref(fig:TraMatfig) we analyse the fold-change for the Transitional a
 ```{r TraMatfig, fig.cap="A plot analysing the difference in expression between Transitional and Mature stage."}
 plot((Mat_exp+Tra_exp)/2, Mat_exp-Tra_exp, pch=".", cex=4, las=1)
 ```
+
+From the three plots above (Figures \@ref(fig:TraColfig), \@ref(fig:MatColfig), \@ref(fig:TraMatfig)), we can see that when Colostrum is compared with another stage the difference in expression is greater, than when we compare Transitional and Mature (Figure \@ref(fig:TraMatfig)).
 
 ## Performing Differential Expression (DE)
 
