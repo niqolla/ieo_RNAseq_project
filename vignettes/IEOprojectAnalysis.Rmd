@@ -1054,7 +1054,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-```{r}
+In the Table \@ref(tab:TOP7CTGO) we see the GO terms related to the top 7 fold-change genes between Colostrum and Transitional.
+
+```{r TOP7CTGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1074,7 +1076,9 @@ kable_styling(ktab, position="center")
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CTKEGG) we see the GO terms related to the top 7 fold-change genes between Colostrum and Transitional.
+
+```{r TOP7CTKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1201,7 +1205,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-```{r}
+In the Table \@ref(tab:TOP7TMGO) we see the GO terms related to the top 7 fold-change genes between Transitional and Mature
+
+```{r TOP7TMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
