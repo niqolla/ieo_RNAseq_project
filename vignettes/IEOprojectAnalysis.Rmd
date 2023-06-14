@@ -497,7 +497,7 @@ We can clearly see that the samples group by lactation stage in the clustering, 
 
 Next we will perform an MDS plot using the names of the lactation stages and colors according to protocol in order to ratify if they in deed group by lactation stage (Figure \@ref(fig:mdsPlot)).
 
-```{r}
+```{r mdsPlot}
 outcome <- se.filt$lacStage
 batch <- as.integer(se.filt$protocolFac)
 names(outcome) <- colnames(se.filt)
@@ -1076,7 +1076,7 @@ kable_styling(ktab, position="center")
 
 ### Top 7 fold-change in KEGG enrichment
 
-In the Table \@ref(tab:TOP7CTKEGG) we see the GO terms related to the top 7 fold-change genes between Colostrum and Transitional.
+In the Table \@ref(tab:TOP7CTKEGG) we see the KEGG terms related to the top 7 fold-change genes between Colostrum and Transitional.
 
 ```{r TOP7CTKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1205,7 +1205,7 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment 
 
-In the Table \@ref(tab:TOP7TMGO) we see the GO terms related to the top 7 fold-change genes between Transitional and Mature
+In the Table \@ref(tab:TOP7TMGO) we see the GO terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
 
 ```{r TOP7TMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
@@ -1220,14 +1220,14 @@ for (i in 1:nrow(goresults)) {
 mask <-new_table$Gene %in% top7_no1 
 goGenesInTop7_no1 <- new_table[mask,]
 
-ktab <- kable(goGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(goGenesInTop7_no1)
 ```
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7TMKEGG) we see the KEGG terms related to the top 7 fold-change genes between Transitional and Mature. We don't display the table, because it's empty.
+
+```{r TOP7TMKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
@@ -1240,9 +1240,7 @@ for (i in 1:nrow(KEGGresults_with_genes)) {
 mask <-KEGG_new_table$Gene %in% top7_no1 
 KEGGGenesInTop7_no1 <- KEGG_new_table[mask,]
 
-ktab <- kable(KEGGGenesInTop7_no1, "html", escape=FALSE, row.names=TRUE, 
-              caption=sprintf("Top 7 fold-change genes in GO enriched pathways between Transitional and Mature"))
-kable_styling(ktab, position="center")
+dim(KEGGGenesInTop7_no1)
 ```
 
 
@@ -1355,7 +1353,9 @@ write.csv(KEGGresults_with_genes, fpathCSV, row.names=FALSE)
 
 ### Top 7 fold-change in GO enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CMGO) we see the GO terms related to the top 7 fold-change genes between Colostrum and Mature.
+
+```{r TOP7CMGO}
 new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(goresults)) {
@@ -1375,7 +1375,9 @@ kable_styling(ktab, position="center")
 
 ### Top 7 fold-change in KEGG enrichment
 
-```{r}
+In the Table \@ref(tab:TOP7CMKEGG) we see the KEGG terms related to the top 7 fold-change genes between Colostrum and Mature.
+
+```{r TOP7CMKEGG}
 KEGG_new_table <- data.frame(Gene = character(), Term = character(), stringsAsFactors = FALSE)
 
 for (i in 1:nrow(KEGGresults_with_genes)) {
